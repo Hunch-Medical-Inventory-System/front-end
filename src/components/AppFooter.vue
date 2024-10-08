@@ -1,13 +1,13 @@
 <template>
-  <v-footer app height="40">
+  <v-footer height="40" app>
     <a
       v-for="item in items"
       :key="item.title"
-      class="d-inline-block mx-2 social-link"
       :href="item.href"
+      :title="item.title"
+      class="d-inline-block mx-2 social-link"
       rel="noopener noreferrer"
       target="_blank"
-      :title="item.title"
     >
       <v-icon
         :icon="item.icon"
@@ -33,7 +33,7 @@
   </v-footer>
 </template>
 
-<script setup lang="ts">
+<script setup>
   const items = [
     {
       title: 'Vuetify Documentation',
