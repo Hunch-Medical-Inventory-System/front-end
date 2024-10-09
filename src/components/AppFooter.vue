@@ -53,7 +53,7 @@
     {
       title: 'Vuetify GitHub',
       icon: `mdi-github`,
-      href: 'https://github.com/vuetifyjs/vuetify',
+      href: 'https://github.com/Hunch-Medical-Inventory-System',
     },
     {
       title: 'Vuetify Discord',
