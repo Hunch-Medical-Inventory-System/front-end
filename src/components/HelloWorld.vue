@@ -10,8 +10,6 @@
         ></v-img>
       </v-row>
       <!-- <v-col cols="12" sm="8" md="6"> -->
-        <!-- Large Image -->
-        
       <v-row class="text-center justify-center">
         <v-btn class="button-styles" size="x-large" to="/login">Demo Login</v-btn>
         <v-btn class="button-styles" size="x-large" to="/profile">Demo Profile</v-btn>
