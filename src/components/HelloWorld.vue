@@ -4,7 +4,7 @@
     <!-- <v-row justify="center"> -->
       <v-row>
         <v-img
-          src="/home/soap/front-end-1/src/components/name.png"
+          src="/workspaces/front-end/src/components/name.png"
           height="700px"
           class="mb-4"
         ></v-img>
