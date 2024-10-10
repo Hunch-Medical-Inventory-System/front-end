@@ -1,5 +1,7 @@
 <script setup>
   import logo from '@/assets/logo.png'
+  import nasaHunch from '@/assets/nasa_hunch.png'
+  import warrenTech from '@/assets/warren_tech.png'
 </script>
 
 <template>
@@ -10,19 +12,13 @@
         <v-row class="text-h1 justify-center my-5">Inventory System</v-row>
         <v-row class="ga-15 mx-15 my-10">
           <v-col>
-            <v-img
-              :src="logo"
-            />
+            <v-img :src="nasaHunch"/>
           </v-col>
           <v-col>
-            <v-img
-              :src="logo"
-            />
+            <v-img :src="logo" />
           </v-col>
           <v-col>
-            <v-img
-              :src="logo"
-            />
+            <v-img :src="warrenTech"/>
           </v-col>
         </v-row>
       </v-container>
