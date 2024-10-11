@@ -1,5 +1,5 @@
 <template>
-  <v-container class="test-container">
+  <v-container class="o-container">
     <div class="form-wrapper">
       <h2 class="login-title">Login</h2>
       <form @submit.prevent="login">
@@ -44,11 +44,13 @@ export default {
 
 
 <style scoped>
-.test-container {
+.o-container {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 
@@ -58,29 +60,93 @@ export default {
   align-items: center;
   width: 100%;
   max-width: 400px;
+  background-color: hsl(0, 0%, 11%);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+
 .input-container {
-  background-color: hsl(189, 100%, 50%);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  border-image: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-size: large;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.3s ease;
 }
+
+
+.input-container:focus {
+  box-shadow: 0px 4px 10px hsla(0, 0%, 100%, 0.815);
+}
+
+
 
 .login-title {
   align-self: flex-start;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 
-  .button-styles {
-    border: 1px solid transparent;
-    transition: all 1s ease;
+
+.button-styles {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid transparent;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+
+.button-styles:hover {
+  background-color: hwb(211 18% 39% / 0);
+  border: 2px solid transparent;
+  border-image: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
+  transform: scale(1.05);
+}
+
+
+
+.error {
+  color: #e47b7b;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
+
+
+@media (max-width: 768px) {
+  .form-wrapper {
+    padding: 15px;
   }
 
-  .button-styles:hover {
-    border: 1px solid transparent;
-    border-image: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
-    transform: scale(1.1);
+
+  .input-container,
+  .button-styles {
+    font-size: 16px;
   }
+}
+
+
+@media (max-width: 480px) {
+  .login-title {
+    font-size: 20px;
+  }
+
+
+  .input-container,
+  .button-styles {
+    font-size: 14px;
+  }
+}
 </style>
