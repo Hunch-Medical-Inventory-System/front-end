@@ -49,6 +49,51 @@ const medicines = [
     dosage: '500mg',
     timeTaken: new Date('2024-10-03T08:00:00'),
   },
+  {
+    name: 'Humira',
+    dosage: '260mg',
+    timeTaken: new Date('2024-10-04T14:39:00'),
+  },
+  {
+    name: 'Adderall',
+    dosage: '350mg',
+    timeTaken: new Date('2024-10-03T07:07:00'),
+  },
+  {
+    name: 'Opdivo',
+    dosage: '120mg',
+    timeTaken: new Date('2024-10-06T03:56:00'),
+  },
+  {
+    name: 'Probuphine',
+    dosage: '310mg',
+    timeTaken: new Date('2024-10-05T06:10:00'),
+  },
+  {
+    name: 'Naltrexone',
+    dosage: '580mg',
+    timeTaken: new Date('2024-10-03T20:00:00'),
+  },
+  {
+    name: 'Botox',
+    dosage: '230mg',
+    timeTaken: new Date('2024-10-07T13:30:00'),
+  },
+  {
+    name: 'Cymbalta',
+    dosage: '390mg',
+    timeTaken: new Date('2024-10-07T12:30:00'),
+  },
+  {
+    name: 'Melatonin',
+    dosage: '180mg',
+    timeTaken: new Date('2024-10-01T11:35:00'),
+  },
+  {
+    name: 'Cephalexin',
+    dosage: '320mg',
+    timeTaken: new Date('2024-10-09T09:00:00'),
+  },
 ];
 
 const FakeAPI = {
@@ -93,9 +138,9 @@ export default {
   data: () => ({
     itemsPerPage: 5,
     headers: [
-      { title: 'Medicine', key: 'name', align: 'start' },
-      { title: 'Dosage', key: 'dosage', align: 'end' },
-      { title: 'Time Taken', key: 'timeTaken', align: 'end' },
+      { title: 'Medication', key: 'name', align: 'start', divider: true },
+      { title: 'Dosage', key: 'dosage', align: 'end', divider: true },
+      { title: 'Time Taken', key: 'timeTaken', align: 'end', divider: true },
     ],
     serverItems: [],
     loading: true,
@@ -138,4 +183,10 @@ table {
 th {
   background-color: #000002;
 }
+
+.v-data-table-header th {
+  font-size: 18px;
+}
 </style>
+
+
