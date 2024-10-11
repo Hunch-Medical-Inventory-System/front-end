@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-container">
+  <v-container rounded="10px" class="profile-container">
     <h1>Demo Profile</h1>
 
     <v-data-table-server
@@ -34,7 +34,7 @@
     <div v-if="!serverItems.length">
       <p>No medicines logged yet.</p>
     </div>
-  </div>
+  </v-container>
 </template>
 
 <script>
