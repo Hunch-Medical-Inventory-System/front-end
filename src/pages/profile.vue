@@ -9,184 +9,159 @@
       :items-length="totalItems"
       :loading="loading"
       :search="search"
-      item-value="name"
+      item-value="id"
       @update:options="loadItems"
     >
       <template v-slot:tfoot>
         <tr>
           <td>
-            <v-text-field v-model="name" class="ma-2" density="compact" placeholder="Search medicine..." hide-details></v-text-field>
-          </td>
-          <td>
-            <v-text- field
-              v-model="dosage"
-              class="ma-2"
-              density="compact"
-              placeholder="Minimum dosage"
-              type="number"
-              hide-details
-            ></v-text->
+            <v-text-field v-model="search" class="ma-2" density="compact" placeholder="Search inventory..." hide-details></v-text-field>
           </td>
         </tr>
       </template>
     </v-data-table-server>
 
     <div v-if="!serverItems.length">
-      <p>No medicines logged yet.</p>
+      <p>No items in inventory yet.</p>
     </div>
   </v-container>
 </template>
 
-<script>
-const medicines = [
-  {
-    name: 'Ibuprofen',
-    dosage: '200mg',
-    timeTaken: new Date('2024-10-04T10:30:00'),
-  },
-  {
-    name: 'Paracetamol',
-    dosage: '500mg',
-    timeTaken: new Date('2024-10-03T08:00:00'),
-  },
-  {
-    name: 'Humira',
-    dosage: '260mg',
-    timeTaken: new Date('2024-10-04T14:39:00'),
-  },
-  {
-    name: 'Adderall',
-    dosage: '350mg',
-    timeTaken: new Date('2024-10-03T07:07:00'),
-  },
-  {
-    name: 'Opdivo',
-    dosage: '120mg',
-    timeTaken: new Date('2024-10-06T03:56:00'),
-  },
-  {
-    name: 'Probuphine',
-    dosage: '310mg',
-    timeTaken: new Date('2024-10-05T06:10:00'),
-  },
-  {
-    name: 'Naltrexone',
-    dosage: '580mg',
-    timeTaken: new Date('2024-10-03T20:00:00'),
-  },
-  {
-    name: 'Botox',
-    dosage: '230mg',
-    timeTaken: new Date('2024-10-07T13:30:00'),
-  },
-  {
-    name: 'Cymbalta',
-    dosage: '390mg',
-    timeTaken: new Date('2024-10-07T12:30:00'),
-  },
-  {
-    name: 'Melatonin',
-    dosage: '180mg',
-    timeTaken: new Date('2024-10-01T11:35:00'),
-  },
-  {
-    name: 'Cephalexin',
-    dosage: '320mg',
-    timeTaken: new Date('2024-10-09T09:00:00'),
-  },
-];
+<script setup>
+import { ref, onMounted } from 'vue'
+import { supabase } from '@/lib/supabaseClient'
 
-const FakeAPI = {
-  async fetch({ page, itemsPerPage, sortBy, search }) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const items = medicines
-          .slice()
-          .filter((item) => {
-            if (search.name && !item.name.toLowerCase().includes(search.name.toLowerCase())) {
-              return false;
-            }
 
-            if (search.dosage && !(Number(item.dosage.replace('mg', '')) >= Number(search.dosage))) {
-              return false;
-            }
+const itemsPerPage = ref(10)
+const headers = ref([
+  { title: 'ID', key: 'id', align: 'start', divider: true },
+  { title: 'Supply Name', key: 'supply_name', align: 'start', divider: true },
+  { title: 'Crew Members', key: 'crew_members', align: 'start', divider: true },
+  { title: 'Dosage', key: 'dosage', align: 'start', divider: true },
+  { title: 'Quantity', key: 'quantity', align: 'end', divider: true },
+  { title: 'Units per Package', key: 'units_per_package', align: 'end', divider: true },
+  { title: 'Expiry Date', key: 'exp_date', align: 'end', divider: true },
+  { title: 'Created At', key: 'created_at', align: 'end', divider: true },
+  { title: 'Crew Member Name', key: 'crew_member_name', align: 'start', divider: true },
+])
 
-            return true;
-          });
+const serverItems = ref([])
+const loading = ref(true)
+const totalItems = ref(0)
+const search = ref('')
 
-        if (sortBy.length) {
-          const sortKey = sortBy[0].key;
-          const sortOrder = sortBy[0].order;
-          items.sort((a, b) => {
-            const aValue = a[sortKey];
-            const bValue = b[sortKey];
-            return sortOrder === 'desc' ? bValue - aValue : aValue - bValue;
-          });
-        }
 
-        const paginated = items.slice(start, end);
 
-        resolve({ items: paginated, total: items.length });
-      }, 500);
-    });
-  },
-};
+const loadItems = async ({ page, itemsPerPage }) => {
+  loading.value = true
 
-export default {
-  data: () => ({
-    itemsPerPage: 5,
-    headers: [
-      { title: 'Medication', key: 'name', align: 'start', divider: true },
-      { title: 'Dosage', key: 'dosage', align: 'end', divider: true },
-      { title: 'Time Taken', key: 'timeTaken', align: 'end', divider: true },
-    ],
-    serverItems: [],
-    loading: true,
-    totalItems: 0,
-    name: '',
-    dosage: '',
-    search: '',
-  }),
-  watch: {
-    name() {
-      this.search = String(Date.now());
-    },
-    dosage() {
-      this.search = String(Date.now());
-    },
-  },
-  methods: {
-    loadItems({ page, itemsPerPage, sortBy }) {
-      this.loading = true;
-      FakeAPI.fetch({
-        page,
-        itemsPerPage,
-        sortBy,
-        search: { name: this.name, dosage: this.dosage },
-      }).then(({ items, total }) => {
-        this.serverItems = items;
-        this.totalItems = total;
-        this.loading = false;
-      });
-    },
-  },
-};
+  const { data, count, error } = await supabase
+    .from('Inventory')
+    .select('*', { count: 'exact' }) 
+    .ilike('supply_name', `%${search.value}%`) 
+    .range((page - 1) * itemsPerPage, page * itemsPerPage - 1)
+
+  if (error) {
+    console.error("Error fetching data:", error)
+    serverItems.value = []
+    totalItems.value = 0
+  } else {
+    serverItems.value = data || []
+    totalItems.value = count || 0
+  }
+
+  loading.value = false
+}
+
+
+onMounted(() => {
+  loadItems({ page: 1, itemsPerPage: itemsPerPage.value })
+})
 </script>
 
+
 <style scoped>
-table {
-  width: 100%;
-  border-collapse: collapse;
+.profile-container {
+  background-color: #000000;
+  border-radius: 12px;
+  border-color: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
-th {
-  background-color: #000002;
-}
+
 
 .v-data-table-header th {
-  font-size: 18px;
+  background-color: #0077c8; 
+  color: #050505;
+  font-size: 16px;
+  text-transform: uppercase;
+  padding: 12px;
+  border-bottom: 2px solid #004f6b; 
+}
+
+.v-data-table__divider {
+  border: none;
+}
+
+.v-data-table__tbody td {
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.v-data-table__tbody tr:hover {
+  background-color: #f1f8ff; 
+}
+
+.v-data-table__tbody td:first-child {
+  border-left: none;
+}
+
+.v-data-table__tbody td:last-child {
+  border-right: none;
+}
+
+
+.v-text-field {
+  background-color: #020202;
+  border-radius: 8px;
+  border: 1px solid #c4dfe6;
+}
+
+.v-text-field .v-input__control {
+  font-size: 14px;
+  padding: 8px;
+}
+
+.v-text-field input {
+  color: #333;
+}
+
+.v-text-field input::placeholder {
+  color: #999;
+}
+
+
+.v-btn {
+  background-color: #0077c8;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 16px;
+  }
+
+  .v-data-table-header th, .v-data-table__tbody td {
+    font-size: 12px;
+    padding: 8px;
+  }
 }
 </style>
-
 
