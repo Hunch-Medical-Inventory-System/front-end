@@ -1,7 +1,9 @@
 <template>
   <v-container class="o-container">
     <div class="form-wrapper">
-      <h2 class="login-title">Login</h2>
+      <h2 class="login-title">Demo Login</h2>
+      <h3>test@example.com</h3>
+      <h3>password</h3>
       <form @submit.prevent="login">
         <v-container class="form-group">
           <label for="email">Email: </label>

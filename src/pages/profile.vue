@@ -18,14 +18,14 @@
             <v-text-field v-model="name" class="ma-2" density="compact" placeholder="Search medicine..." hide-details></v-text-field>
           </td>
           <td>
-            <v-text-field
+            <v-text- field
               v-model="dosage"
               class="ma-2"
               density="compact"
               placeholder="Minimum dosage"
               type="number"
               hide-details
-            ></v-text-field>
+            ></v-text->
           </td>
         </tr>
       </template>
