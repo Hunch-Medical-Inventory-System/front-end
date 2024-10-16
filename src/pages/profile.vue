@@ -1,6 +1,6 @@
 <template>
   <v-container rounded="10px" class="profile-container">
-    <h1>Demo Profile</h1>
+    <h1>Inventory Profile</h1>
 
     <v-data-table-server
       v-model:items-per-page="itemsPerPage"
@@ -12,9 +12,24 @@
       item-value="id"
       @update:options="loadItems"
     >
+      <!-- Row template with conditional class based on expiry date -->
+      <template v-slot:item="{ item }">
+        <tr :class="getExpiryClass(item.exp_date)">
+          <td>{{ item.id }}</td>
+          <td>{{ item.supply_name }}</td>
+          <td>{{ item.crew_members }}</td>
+          <td>{{ item.dosage }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.units_per_package }}</td>
+          <td>{{ new Date(item.exp_date).toLocaleDateString() }}</td>
+          <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
+          <td>{{ item.crew_member_name }}</td>
+        </tr>
+      </template>
+
       <template v-slot:tfoot>
         <tr>
-          <td>
+          <td colspan="9">
             <v-text-field v-model="search" class="ma-2" density="compact" placeholder="Search inventory..." hide-details></v-text-field>
           </td>
         </tr>
@@ -50,15 +65,31 @@ const loading = ref(true)
 const totalItems = ref(0)
 const search = ref('')
 
+const getExpiryClass = (expDate) => {
+  const today = new Date()
+  const expiry = new Date(expDate)
+  const diffTime = expiry - today
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) 
+
+  if (diffDays <= 0) {
+    return 'expired' 
+  } else if (diffDays <= 7) {
+    return 'about-to-expire'
+  } else if (diffDays <= 30) {
+    return 'expiring-soon'
+  }
+  return '' 
+}
 
 
 const loadItems = async ({ page, itemsPerPage }) => {
   loading.value = true
 
+
   const { data, count, error } = await supabase
     .from('Inventory')
-    .select('*', { count: 'exact' }) 
-    .ilike('supply_name', `%${search.value}%`) 
+    .select('*', { count: 'exact' })
+    .ilike('supply_name', `%${search.value}%`)
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1)
 
   if (error) {
@@ -73,14 +104,25 @@ const loadItems = async ({ page, itemsPerPage }) => {
   loading.value = false
 }
 
-
 onMounted(() => {
   loadItems({ page: 1, itemsPerPage: itemsPerPage.value })
 })
 </script>
 
-
 <style scoped>
+.expired {
+  background-color: hwb(355 4% 9%); /*Expired items */
+}
+
+.about-to-expire {
+  background-color: hwb(39 6% 14%); /* Items expiring within 7 days */
+}
+
+.expiring-soon {
+  background-color: hsl(54, 93%, 48%); /* Items expiring within 30 days */
+}
+
+
 .profile-container {
   background-color: #000000;
   border-radius: 12px;
@@ -108,13 +150,10 @@ onMounted(() => {
 .v-data-table__tbody td {
   padding: 10px;
   font-size: 14px;
-  color: #333;
+  color: hsl(0, 0%, 100%);
   border-bottom: 1px solid #e0e0e0;
 }
 
-.v-data-table__tbody tr:hover {
-  background-color: #f1f8ff; 
-}
 
 .v-data-table__tbody td:first-child {
   border-left: none;
@@ -137,7 +176,7 @@ onMounted(() => {
 }
 
 .v-text-field input {
-  color: #333;
+  color: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
 }
 
 .v-text-field input::placeholder {
