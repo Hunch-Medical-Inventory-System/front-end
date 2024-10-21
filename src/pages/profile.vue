@@ -136,7 +136,7 @@ onMounted(() => {
 
 .v-data-table-header th,
 .v-data-table__tbody td {
-  text-align: center; /* Centers headers and data */
+  text-align: center; 
 }
 
 .v-data-table__divider {
@@ -145,9 +145,10 @@ onMounted(() => {
 
 .v-data-table__tbody td {
   padding: 10px;
-  font-size: 14px;
+  font-size: 14px;  
   color: hwb(0 100% 0%);
   border-bottom: 1px solid #e0e0e0;
+
 }
 
 .v-data-table__tbody td:first-child {
