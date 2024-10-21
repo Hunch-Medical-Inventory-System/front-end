@@ -18,12 +18,13 @@
           <td>{{ item.id }}</td>
           <td>{{ item.supply_name }}</td>
           <td>{{ item.crew_members }}</td>
-          <td>{{ item.dosage }}</td>
+          <td>{{ item.dosage_taken }}</td>
           <td>{{ item.quantity }}</td>
           <td>{{ item.units_per_package }}</td>
           <td>{{ new Date(item.exp_date).toLocaleDateString() }}</td>
           <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
           <td>{{ item.crew_member_name }}</td>
+          <td>{{ item.location }}</td>
         </tr>
       </template>
 
@@ -49,15 +50,16 @@ import { supabase } from '@/lib/supabaseClient'
 
 const itemsPerPage = ref(10)
 const headers = ref([
-  { title: 'ID', key: 'id', align: 'start', divider: true },
-  { title: 'Supply Name', key: 'supply_name', align: 'start', divider: true },
-  { title: 'Crew Members', key: 'crew_members', align: 'start', divider: true },
-  { title: 'Dosage', key: 'dosage', align: 'start', divider: true },
-  { title: 'Quantity', key: 'quantity', align: 'end', divider: true },
-  { title: 'Units per Package', key: 'units_per_package', align: 'end', divider: true },
-  { title: 'Expiry Date', key: 'exp_date', align: 'end', divider: true },
-  { title: 'Created At', key: 'created_at', align: 'end', divider: true },
-  { title: 'Crew Member Name', key: 'crew_member_name', align: 'start', divider: true },
+  { title: 'ID', key: 'id', align: 'center', divider: true },
+  { title: 'Supply Name', key: 'supply_name', align: 'center', divider: true },
+  { title: 'Member ID', key: 'crew_members', align: 'center', divider: true },
+  { title: 'Dosage', key: 'dosage', align: 'center', divider: true },
+  { title: 'Quantity', key: 'quantity', align: 'center', divider: true },
+  { title: 'Units per Package', key: 'units_per_package', align: 'center', divider: true },
+  { title: 'Expiry Date', key: 'exp_date', align: 'center', divider: true },
+  { title: 'Created At', key: 'created_at', align: 'center', divider: true },
+  { title: 'Crew Member Name', key: 'crew_member_name', align: 'center', divider: true },
+  { title: 'Location', key: 'location', align: 'center', divider: true },
 ])
 
 const serverItems = ref([])
@@ -111,7 +113,7 @@ onMounted(() => {
 
 <style scoped>
 .expired {
-  background-color: hwb(355 4% 9%); /*Expired items */
+  background-color: hwb(355 4% 9%); /* Expired items */
 }
 
 .about-to-expire {
@@ -121,7 +123,6 @@ onMounted(() => {
 .expiring-soon {
   background-color: hsl(54, 93%, 48%); /* Items expiring within 30 days */
 }
-
 
 .profile-container {
   background-color: #000000;
@@ -133,14 +134,9 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-
-.v-data-table-header th {
-  background-color: #0077c8; 
-  color: #050505;
-  font-size: 16px;
-  text-transform: uppercase;
-  padding: 12px;
-  border-bottom: 2px solid #004f6b; 
+.v-data-table-header th,
+.v-data-table__tbody td {
+  text-align: center; /* Centers headers and data */
 }
 
 .v-data-table__divider {
@@ -150,10 +146,9 @@ onMounted(() => {
 .v-data-table__tbody td {
   padding: 10px;
   font-size: 14px;
-  color: hsl(0, 0%, 100%);
+  color: hwb(0 100% 0%);
   border-bottom: 1px solid #e0e0e0;
 }
-
 
 .v-data-table__tbody td:first-child {
   border-left: none;
@@ -162,7 +157,6 @@ onMounted(() => {
 .v-data-table__tbody td:last-child {
   border-right: none;
 }
-
 
 .v-text-field {
   background-color: #020202;
@@ -176,13 +170,12 @@ onMounted(() => {
 }
 
 .v-text-field input {
-  color: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
+  color: linear-gradient(to right, rgb(0, 8, 12), hwb(228 7% 20%)) 1;
 }
 
 .v-text-field input::placeholder {
   color: #999;
 }
-
 
 .v-btn {
   background-color: #0077c8;
@@ -191,7 +184,6 @@ onMounted(() => {
   font-weight: bold;
 }
 
-/* Responsive design for smaller screens */
 @media (max-width: 768px) {
   .profile-container {
     padding: 16px;
