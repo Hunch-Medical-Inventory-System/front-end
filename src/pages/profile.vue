@@ -2,19 +2,18 @@
   <v-container rounded="10px" class="profile-container">
     <h1>Inventory Profile</h1>
 
-
     <v-alert
       v-if="alertMessage"
       type="warning"
       border="top"
       prominent
-      class="mb-4"
+      class="mb-4 v_alert alert-pop-in"
     >
       {{ alertMessage }}
     </v-alert>
 
-
-    <v-data-table-server
+    <!-- Data table -->
+    <v-data-table
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
       :items="serverItems"
@@ -24,7 +23,6 @@
       item-value="id"
       @update:options="loadItems"
     >
-
       <template v-slot:item="{ item }">
         <tr :class="getExpiryClass(item.exp_date)">
           <td>{{ item.id }}</td>
@@ -40,7 +38,6 @@
         </tr>
       </template>
 
-
       <template v-slot:tfoot>
         <tr>
           <td colspan="9">
@@ -48,20 +45,14 @@
           </td>
         </tr>
       </template>
-    </v-data-table-server>
+    </v-data-table>
 
-
-    <div v-if="!serverItems.length">
-      <p>No items in inventory yet.</p>
-    </div>
   </v-container>
 </template>
-
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
-
 
 const itemsPerPage = ref(10)
 const headers = ref([
@@ -77,20 +68,58 @@ const headers = ref([
   { title: 'Location', key: 'location', align: 'center', divider: true },
 ])
 
-
 const serverItems = ref([])
 const loading = ref(true)
 const totalItems = ref(0)
 const search = ref('')
 const alertMessage = ref('')
+const showMenu = ref(false)
+const selectedMed = ref(null)
+const medOptions = ref([])
+const newQuantity = ref('')
+const newExpiryDate = ref('')
 
+const showAlert = (message) => {
+  alertMessage.value = message
+}
+
+const toggleMenu = () => {
+  showMenu.value = !showMenu.value
+}
+
+const fetchMedOptions = async () => {
+  const { data, error } = await supabase.from('Inventory').select('supply_name')
+  if (error) {
+    console.error("Error fetching meds:", error)
+  } else {
+    medOptions.value = data.map(med => med.supply_name)
+  }
+}
+
+const submitNewDetails = async () => {
+  if (selectedMed.value && newQuantity.value && newExpiryDate.value) {
+    const { error } = await supabase
+      .from('Inventory')
+      .update({
+        quantity: newQuantity.value,
+        exp_date: newExpiryDate.value,
+      })
+      .eq('supply_name', selectedMed.value)
+
+    if (error) {
+      console.error("Error updating inventory:", error)
+    } else {
+      console.log("Inventory updated successfully")
+      showMenu.value = false
+    }
+  }
+}
 
 const getExpiryClass = (expDate) => {
   const today = new Date()
   const expiry = new Date(expDate)
   const diffTime = expiry - today
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
 
   if (diffDays <= 0) {
     return 'expired'
@@ -102,25 +131,14 @@ const getExpiryClass = (expDate) => {
   return ''
 }
 
-
-const showAlert = (message) => {
-  alertMessage.value = message
-  setTimeout(() => {
-    alertMessage.value = ''
-  }, 20000)
-}
-
-
 const loadItems = async ({ page, itemsPerPage }) => {
   loading.value = true
-
 
   const { data, count, error } = await supabase
     .from('Inventory')
     .select('*', { count: 'exact' })
     .ilike('supply_name', `%${search.value}%`)
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1)
-
 
   if (error) {
     console.error("Error fetching data:", error)
@@ -131,11 +149,8 @@ const loadItems = async ({ page, itemsPerPage }) => {
     totalItems.value = count || 0
   }
 
-
   loading.value = false
 }
-
-
 
 watch(serverItems, (newItems) => {
   newItems.forEach((item) => {
@@ -148,83 +163,51 @@ watch(serverItems, (newItems) => {
   })
 })
 
-
 onMounted(() => {
   loadItems({ page: 1, itemsPerPage: itemsPerPage.value })
+  fetchMedOptions()
 })
 </script>
-
 
 <style scoped>
 .expired {
   background-color: hwb(355 4% 9%); /* Expired items */
 }
 
-
 .about-to-expire {
   background-color: hwb(39 6% 14%); /* Items expiring within 7 days */
 }
 
-
 .expiring-soon {
-  background-color: hsl(54, 93%, 48%); /* Items expiring within 30 days */
+  font-size: 14px;
+  color: rgb(198, 180, 17); /* Items expiring within 30 days */
 }
-
 
 .profile-container {
   background-color: #000000;
-  border-radius: 12px;
-  border-color: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  max-width: 1200px;
+  border-radius: 10px;
+  padding: 2em;
+  color: #ffffff;
+  max-width: 80%;
   margin: 0 auto;
 }
 
-
-.v-data-table-header th,
-.v-data-table__tbody td {
-  text-align: center;
-}
-
-
-.v-data-table__divider {
-  border: none;
-}
-
-
-.v-data-table__tbody td {
-  padding: 10px;
-  font-size: 14px;
-  color: hwb(0 100% 0%);
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.v-alert.error {
-  background-color: #ff4d4d; /* Red for expired */
+.v_alert {
+  background-color: hwb(0 21% 27% / 0.897) 55%, 47%, 0.897;;
 }
 
 .alert-pop-in {
-  animation: popIn 0.5s ease-in-out;
-  cursor: pointer
+  animation: pop-in 0.6s ease-in-out;
 }
 
-.v-text-field {
-  background-color: #020202;
-  border-radius: 8px;
-  border: 1px solid #c4dfe6;
-}
-
-
-.v-alert {
-  border-radius: 10px;
-}
-
-
-.v-btn {
-  background-color: #0077c8;
-  color: white;
-  text-transform: uppercase;
-  font-weight: bold;
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>
