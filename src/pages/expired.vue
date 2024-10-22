@@ -18,7 +18,7 @@
             <td>{{ item.quantity }}</td>
             <td>{{ item.units_per_package }}</td>
             <td>{{ new Date(item.exp_date).toLocaleDateString() }}</td>
-            <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
+            <td>{{ new Date(item.created_at).toL' ocaleDateString() }}</td>
             <td>{{ item.crew_member_name }}</td>
           </tr>
         </template>
