@@ -63,7 +63,7 @@ const medOptions = ref([]);
 // Fetch medication options from Supabase
 const fetchMedOptions = async () => {
   const { data, error } = await supabase
-    .from('Inventory')
+    .from('inventory')
     .select('supply_name');
 
   if (error) {
@@ -81,7 +81,7 @@ const submitNewDetails = async () => {
   }
 
   const { error } = await supabase
-    .from('Inventory')
+    .from('inventory')
     .update({
       quantity: parseInt(newQuantity.value, 10), // Parse to ensure it's a number
       exp_date: newExpiryDate.value,
