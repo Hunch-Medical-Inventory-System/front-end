@@ -37,6 +37,9 @@
       <v-col>
         <v-btn class="button-styles" size="x-large" to="/update">Update</v-btn>
       </v-col>
+      <v-col>
+        <v-btn class="button-styles" size="x-large" to="/sku_test">SKU Test</v-btn>
+      </v-col>
     </v-row>
     <!-- </v-col> -->
   </v-container>
