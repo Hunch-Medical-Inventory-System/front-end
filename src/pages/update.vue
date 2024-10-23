@@ -23,7 +23,7 @@
             :rules="[v => !!v || 'Quantity is required']"
           ></v-text-field>
 
-          <!-- Expiration Date Picker -->
+          
           <v-date-picker
             v-model="newExpiryDate"
             label="Select New Expiration Date"
@@ -42,7 +42,7 @@
     </v-card>
   </v-container>
 
-  <!-- Show loading message when options are being fetched -->
+
   <div v-else class="loading-message">Loading medications...</div>
 </template>
 
@@ -60,10 +60,8 @@ const newQuantity = ref('');
 const newExpiryDate = ref(null);
 const medOptions = ref([]);
 
-// Set maximum date to prevent past selections
-const maxDate = ref(new Date().toISOString().substr(0, 10));
 
-// Fetch medication options from the database
+
 const fetchMedOptions = async () => {
   const { data, error } = await supabase
     .from('Inventory')
@@ -76,7 +74,7 @@ const fetchMedOptions = async () => {
   }
 };
 
-// Submit the updated medication details
+
 const submitNewDetails = async () => {
   if (selectedMed.value && newQuantity.value && newExpiryDate.value) {
     const { error } = await supabase
@@ -98,12 +96,12 @@ const submitNewDetails = async () => {
   }
 };
 
-// Go back to profile page without saving changes
+
 const goBack = () => {
   router.push('/profile');
 };
 
-// Fetch medication options when component mounts
+
 onMounted(fetchMedOptions);
 </script>
 
