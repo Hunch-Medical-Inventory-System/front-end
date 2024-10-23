@@ -88,7 +88,7 @@ const toggleMenu = () => {
 }
 
 const fetchMedOptions = async () => {
-  const { data, error } = await supabase.from('Inventory').select('supply_name')
+  const { data, error } = await supabase.from('inventory').select('supply_name')
   if (error) {
     console.error("Error fetching meds:", error)
   } else {
@@ -99,7 +99,7 @@ const fetchMedOptions = async () => {
 const submitNewDetails = async () => {
   if (selectedMed.value && newQuantity.value && newExpiryDate.value) {
     const { error } = await supabase
-      .from('Inventory')
+      .from('inventory')
       .update({
         quantity: newQuantity.value,
         exp_date: newExpiryDate.value,
@@ -135,7 +135,7 @@ const loadItems = async ({ page, itemsPerPage }) => {
   loading.value = true
 
   const { data, count, error } = await supabase
-    .from('Inventory')
+    .from('inventory')
     .select('*', { count: 'exact' })
     .ilike('supply_name', `%${search.value}%`)
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1)

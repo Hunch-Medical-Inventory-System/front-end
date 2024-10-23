@@ -14,6 +14,7 @@
             required
           ></v-select>
 
+          <!-- Quantity Input -->
           <v-text-field
             v-model="newQuantity"
             label="Enter New Quantity"
@@ -23,13 +24,12 @@
             :rules="[v => !!v || 'Quantity is required']"
           ></v-text-field>
 
-          
+          <!-- Expiration Date Picker -->
           <v-date-picker
             v-model="newExpiryDate"
             label="Select New Expiration Date"
             class="form-item"
             :rules="[v => !!v || 'Expiration date is required']"
-            :max="maxDate"
           ></v-date-picker>
         </v-form>
       </v-card-text>
@@ -42,26 +42,25 @@
     </v-card>
   </v-container>
 
-
+  <!-- Show loading message when options are being fetched -->
   <div v-else class="loading-message">Loading medications...</div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { supabase } from '@/lib/supabaseClient'; // Ensure this path is correct
+import { supabase } from '@/lib/supabaseClient';
 
 // Initialize router
 const router = useRouter();
 
 // Reactive variables
 const selectedMed = ref(null);
-const newQuantity = ref('');
+const newQuantity = ref(null); // Initialized as a number instead of a string
 const newExpiryDate = ref(null);
 const medOptions = ref([]);
 
-
-
+// Fetch medication options from Supabase
 const fetchMedOptions = async () => {
   const { data, error } = await supabase
     .from('Inventory')
@@ -74,34 +73,35 @@ const fetchMedOptions = async () => {
   }
 };
 
-
+// Submit the updated details to Supabase
 const submitNewDetails = async () => {
-  if (selectedMed.value && newQuantity.value && newExpiryDate.value) {
-    const { error } = await supabase
-      .from('Inventory')
-      .update({
-        quantity: newQuantity.value,
-        exp_date: newExpiryDate.value,
-      })
-      .eq('supply_name', selectedMed.value);
-
-    if (error) {
-      console.error('Error updating inventory:', error);
-    } else {
-      console.log('Medication updated successfully');
-      router.push('/profile'); // Redirect to profile page after submission
-    }
-  } else {
+  if (!selectedMed.value || !newQuantity.value || !newExpiryDate.value) {
     console.error('Please fill out all fields before submitting.');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('Inventory')
+    .update({
+      quantity: parseInt(newQuantity.value, 10), // Parse to ensure it's a number
+      exp_date: newExpiryDate.value,
+    })
+    .eq('supply_name', selectedMed.value);
+
+  if (error) {
+    console.error('Error updating inventory:', error);
+  } else {
+    console.log('Medication updated successfully');
+    router.push('/profile');
   }
 };
 
-
+// Go back to the profile page
 const goBack = () => {
   router.push('/profile');
 };
 
-
+// Fetch medication options when component mounts
 onMounted(fetchMedOptions);
 </script>
 
@@ -111,7 +111,7 @@ onMounted(fetchMedOptions);
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #00000000;
 }
 
 .update-card {
@@ -119,7 +119,7 @@ onMounted(fetchMedOptions);
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  background-color: #ffffff;
+  background-color: hsla(0, 0%, 0%, 0.817);
 }
 
 .title {
