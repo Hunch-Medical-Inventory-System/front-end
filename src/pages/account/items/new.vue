@@ -1,9 +1,16 @@
 <script setup>
+  import { useCounterStore } from '@/stores/tables';
+  import { storeToRefs } from 'pinia';
+
+  const store = useCounterStore();
+
+  const { crewMembers } = storeToRefs(store);
 
 </script>
 
 <template>
   <v-container>
-    new
+    test
+    {{ crewMembers }}
   </v-container>
 </template>
