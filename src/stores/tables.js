@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { supabase } from "@/lib/supabaseClient";
 
 const readDataFromTable = async (table) => {
   const { data, error } = await supabase.from(table).select("*").eq("is_deleted", false);
@@ -10,13 +11,37 @@ const readDataFromTable = async (table) => {
   return data;
 }
 
-export const useCounterStore = defineStore("counter", () => {
+export const useCrewStore = defineStore("crew", () => {
 
-  const crewMembers = ref([{ id: 1, name: "Eduardo" }]);
-
-  const updateCrewMember = () => {
-    crewMembers.value = readDataFromTable("crew_members");
+  const crewMembers = ref([{}]);
+  const updateCrewMember = async () => {
+    crewMembers.value = await readDataFromTable("crew");
   };
 
-  return { crewMembers, name, doubleCount, updateCrewMember };
+  onMounted(() => {
+    updateCrewMember();
+  });
+
+  return { crewMembers, updateCrewMember };
 });
+
+export const useInventoryStore = defineStore("inventory", () => {
+
+  const inventory = ref([{}]);
+  const retrieveInventory = async () => {
+    inventory.value = await readDataFromTable("inventory");
+  };
+
+  const updateInventoryRow = async (id) => {
+    const { error } = await fetch("inventory", id);
+    if (error) {
+      console.log(error);
+    }
+  }
+
+  onMounted(() => {
+    retrieveInventory();
+  });
+
+  return { inventory, retrieveInventory };
+})
