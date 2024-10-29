@@ -1,4 +1,5 @@
 <template>
+  <v-app class="bg-container">
   <v-container rounded="10px" class="profile-container">
     <h1>Inventory Profile</h1>
 
@@ -48,6 +49,7 @@
     </v-data-table>
 
   </v-container>
+  </v-app>
 </template>
 
 <script setup>
@@ -190,6 +192,13 @@ onMounted(() => {
   color: #ffffff;
   max-width: 80%;
   margin: 0 auto;
+}
+
+.bg-container {
+  background-image: url('@/assets/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .v_alert {
