@@ -26,7 +26,7 @@
     <!-- <v-col cols="12" sm="8" md="6"> -->
     <v-row class="text-center justify-center">
       <v-col>
-        <v-btn class="button-styles elevation-10" size="x-large" to="/login">Demo Login</v-btn>
+        <v-btn class="button-styles elevation-10" size="x-large" to="/account/login">Demo Login</v-btn>
       </v-col>
       <v-col>
         <v-btn class="button-styles" size="x-large" to="/profile">Demo Profile</v-btn>
@@ -40,20 +40,34 @@
       <v-col>
         <v-btn class="button-styles" size="x-large" to="/log">NFC logs</v-btn>
       </v-col>
+      <v-col>
+        <v-btn class="button-styles" size="x-large" to="/alerts">Alerts</v-btn>
+      </v-col>
     </v-row>
     <!-- </v-col> -->
   </v-container>
 </template>
 
 <style scoped>
+.button-styles {
+  padding: 10px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #333; 
+  border: 2px solid transparent; 
+  border-radius: 25px; 
+  transition: all 0.4s ease; 
+}
 
-  .button-styles {
-    border: 1px solid transparent;
-    transition: all 1s ease;
-  }
-
-  .button-styles:hover {
-    border: 1px solid transparent;
-    border-image: linear-gradient(to right, hwb(198 2% 10%), hwb(228 7% 20%)) 1;
-  }
+.button-styles:hover {
+  padding: 10px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: hsl(215, 86%, 22%); 
+  border: 2px solid transparent; 
+  border-radius: 25px; 
+}
 </style>
+
