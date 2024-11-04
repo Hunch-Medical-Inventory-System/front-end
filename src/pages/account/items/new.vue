@@ -72,7 +72,5 @@ import { ref } from 'vue';
       multiple
       chips
     ></v-select>
-    test
-    {{ currentCrewMember }}
   </v-container>
 </template>
