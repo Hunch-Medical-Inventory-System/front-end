@@ -14,7 +14,7 @@
 
 <style scoped>
 .bg-container {
-  background-image: url('@/assets/bg.png');
+  background-image: url('@/assets/space.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
