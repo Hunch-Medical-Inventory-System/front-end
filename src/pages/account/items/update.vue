@@ -1,18 +1,13 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
+  import { useSuppliesStore } from '@/stores/tables';
+  import { storeToRefs } from 'pinia';
+
+  const suppliesStore = useSuppliesStore();
+  const { suppliesItem, suppliesItemId } = storeToRefs(suppliesStore);
 
   const rules = ref({
     required: value => !!value || 'Required.',
-  });
-
-  const newItem = ref({
-    type: '',
-    item:'',
-    strength_or_volume: '',
-    route_of_use: '',
-    quantity_in_pack: '',
-    possible_side_effects: '',
-    location: '',
   });
 
   const formRef = ref(null);
@@ -20,17 +15,6 @@
   const status = ref(null);
 
 
-  /**
-   * Asynchronously saves a new item to the inventory.
-   *
-   * Validates the form using formRef. If the form is valid,
-   * the function sends a POST request to the 'inventory' endpoint
-   * with the new item data in JSON format. Upon successful submission,
-   * the form is reset. If validation fails, the function sets the
-   * errs reactive variable to "Please fill out all required fields".
-   * If the POST request fails, the function sets the errs reactive
-   * variable to "Something went wrong".
-   */
   const saveItem = async () => {
     const { valid } = await formRef.value.validate();
 
@@ -39,12 +23,12 @@
       return
     }
 
-    const data = await fetch("/api/supplies", {
-      method: 'POST',
+    const data = await fetch(`/api/supplies/${suppliesItemId.value}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newItem.value),
+      body: JSON.stringify(suppliesItem.value),
     });
 
     status.value = data.status === 200 ? "Success" : "Error";
@@ -69,39 +53,39 @@
           <v-row>
             <v-col>
               <v-text-field
-                v-model="newItem.type"
+                v-model="suppliesItem.type"
                 label="Item Type"
                 :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
-                v-model="newItem.item"
+                v-model="suppliesItem.item"
                 label="Item Name"
                 :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
-                v-model="newItem.strength_or_volume"
+                v-model="suppliesItem.strength_or_volume"
                 label="Strength/Volume"
                 :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
-                v-model="newItem.route_of_use"
+                v-model="suppliesItem.route_of_use"
                 label="Route of Use"
                 :rules="[rules.required]"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
-                v-model="newItem.quantity_in_pack"
+                v-model="suppliesItem.quantity_in_pack"
                 label="Quantity in Pack"
                 :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
-                v-model="newItem.possible_side_effects"
+                v-model="suppliesItem.possible_side_effects"
                 label="Possible Side Effects"
                 :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
-                v-model="newItem.location"
+                v-model="suppliesItem.location"
                 label="Location"
                 :rules="[rules.required]"
               ></v-text-field>

@@ -120,6 +120,28 @@ export const useSuppliesStore = defineStore("supplies", () => {
   const currentSuppliesLength = computed(() => currentSupplies.value.length);
   const deletedSuppliesLength = computed(() => deletedSupplies.value.length);
 
+  // const suppliesItem = ref({
+  //   type: '',
+  //   item: '',
+  //   strength_or_volume: '',
+  //   route_of_use: '',
+  //   quantity_in_pack: '',
+  //   possible_side_effects: '',
+  //   location: '',
+  // });
+
+  const suppliesItem = ref({
+    item: "Fluconazole (Diflucan)",
+    location: "B2",
+    possible_side_effects:
+      "Headache, dizziness, nausea, abdominal pain, vomiting, diarrhea, rash",
+    quantity_in_pack: "5 tablet",
+    route_of_use: "Oral",
+    strength_or_volume: "150 mg",
+    type: "Antifungal",
+  });
+  const suppliesItemId = ref(1);
+
   const suppliesLoading = ref(true);
 
 /**
@@ -143,6 +165,8 @@ export const useSuppliesStore = defineStore("supplies", () => {
     suppliesLoading,
     currentSupplies,
     deletedSupplies,
+    suppliesItem,
+    suppliesItemId,
     currentSuppliesLength,
     deletedSuppliesLength,
     retrieveSupplies
