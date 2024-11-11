@@ -1,37 +1,50 @@
 <template>
   <v-app class="bg-container">
-    <v-container rounded="10px" class="profile-container">
+    <v-container class="profile-container" rounded="10px">
       <h1>Inventory Profile</h1>
 
-      <v-alert v-if="alertMessage" type="warning" border="top" prominent class="mb-4 v_alert alert-pop-in">
+      <v-alert
+        v-if="alertMessage"
+        border="top"
+        class="mb-4 v_alert alert-pop-in"
+        prominent
+        type="warning"
+      >
         {{ alertMessage }}
       </v-alert>
-      <!-- {{ currentInventory }} -->
-
+        <!-- {{ currentInventory }} -->
+        <!-- {{ currentSupplies }} -->
       <!-- Data table -->
       <v-data-table-server
         v-model:items-per-page="itemsPerPage"
+        v-model:page="page"
         :headers="headers"
-        :items="currentInventory"
-        :items-length="totalItems"
-        :loading="loading" item-value="name"
-        @update:options="loadItems"
+        item-value="name"
+        :items="currentInventory.data"
+        :items-length="currentInventoryLength"
+        :loading="inventoryLoading"
+        @update:options="loadInventory"
       >
         <template #item="{ item }">
           <tr>
             <td>{{ item.id }}</td>
-            <td>{{ item.supply_id }}</td>
+            <td>{{ suppliesLoading ? 'Loading...' : currentSupplies.data.find(supply => supply.id === item.supply_id).item }}</td>
             <td>{{ new Date(item.expiry_date).toLocaleDateString() }}</td>
             <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
             <td>{{ item.card_id }}</td>
           </tr>
         </template>
 
-        <template v-slot:tfoot>
+        <template #tfoot>
           <tr>
             <td colspan="9">
-              <v-text-field v-model="search" class="ma-2" density="compact" placeholder="Search inventory..."
-                hide-details></v-text-field>
+              <v-text-field
+                v-model="search"
+                class="ma-2"
+                density="compact"
+                hide-details
+                placeholder="Search inventory..."
+              />
             </td>
           </tr>
         </template>
@@ -42,37 +55,46 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
+  import { ref } from 'vue'
+  import { storeToRefs } from 'pinia'
 
-import { supabase } from '@/lib/supabaseClient'
-import { useSuppliesStore, useInventoryStore } from '@/stores/tables'
+  import { useInventoryStore, useSuppliesStore } from '@/stores/tables'
 
-const suppliesStore = useSuppliesStore();
-const inventoryStore = useInventoryStore();
+  const suppliesStore = useSuppliesStore()
+  const inventoryStore = useInventoryStore()
 
-const { suppliesLoading, currentSupplies, currentSuppliesLength } = storeToRefs(suppliesStore);
-const { inventoryLoading, currentInventory, currentInventoryLength, retrieveInventory } = storeToRefs(inventoryStore);
+  const { suppliesLoading, currentSupplies } = storeToRefs(suppliesStore)
+  const { inventoryLoading, currentInventory, currentInventoryLength } = storeToRefs(inventoryStore)
 
-const search = ref('')
-const itemsPerPage = ref(10)
-const serverItems = ref([])
-const alertMessage = ref(null)
-const headers = ref([
-  { title: 'Id', key: 'id' },
-  { title: 'Supply Id', key: 'supply_id' },
-  { title: 'Expiry Date', key: 'expiry_date' },
-  // { title: 'Dosage Taken', key: 'dosage_taken' },
-  // { title: 'Quantity', key: 'quantity' },
-  // { title: 'Units Per Package', key: 'units_per_package' },
-  // { title: 'Location', key: 'location' },
-  { title: 'Created At', key: 'created_at' },
-  { title: 'Card Id', key: 'card_id' },
-])
+  const search = ref('')
+  const itemsPerPage = ref(10)
+  const page = ref(1)
+  const alertMessage = ref(null)
+  const headers = ref([
+    { title: 'Id', key: 'id' },
+    { title: 'Supply Name', key: 'supply_id' },
+    { title: 'Expiry Date', key: 'expiry_date' },
+    // { title: 'Dosage Taken', key: 'dosage_taken' },
+    // { title: 'Quantity', key: 'quantity' },
+    // { title: 'Units Per Package', key: 'units_per_package' },
+    // { title: 'Location', key: 'location' },
+    { title: 'Created At', key: 'created_at' },
+    { title: 'Card Id', key: 'card_id' },
+  ])
 
-const loadInventory = async () => {
-  inventoryStore.retrieveInventory();
-}
+  /**
+   * Fetches the inventory from the store, passing the current search query,
+   * page number, and items per page as options.
+   *
+   * @returns {Promise<void>}
+   */
+  const loadInventory = async () => {
+    inventoryStore.retrieveInventory({
+      search: search.value,
+      page: page.value,
+      itemsPerPage: itemsPerPage.value
+    })
+  }
 
 </script>
 

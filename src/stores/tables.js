@@ -10,15 +10,21 @@ import { supabase } from "@/lib/supabaseClient";
    *  currentData: the data from the table that has not been deleted
    *  deletedData: the data from the table that has been deleted
    */
-const readDataFromTable = async (table) => {
+const readDataFromTable = async (table, options = {itemsPerPage:10, page:1, keywords:""}) => {
+
   let currentData = [{}];
   let deletedData = [{}];
   try {
-
-    let currentResponse = await supabase.from(table).select("*").eq("is_deleted", false);
-    let deletedResponse = await supabase.from(table).select("*").eq("is_deleted", true);
-    currentData = currentResponse.data;
-    deletedData = deletedResponse.data;
+    let currentResponse = await supabase.from(table)
+      .select("*", { count: "exact" })
+      .eq("is_deleted", false)
+      .range(options.itemsPerPage * (options.page - 1), (options.itemsPerPage - 1) * options.page)
+    let deletedResponse = await supabase.from(table)
+      .select("*")
+      .eq("is_deleted", true)
+      .range(options.itemsPerPage * (options.page - 1), (options.itemsPerPage - 1) * options.page)
+    currentData = currentResponse;
+    deletedData = deletedResponse;
   } catch (error) {
     console.error(error);
   }
@@ -42,6 +48,7 @@ export const useCrewStore = defineStore("crew", () => {
   const deletedCrewMembersLength = computed(() => deletedCrewMembers.value.length);
 
   const crewLoading = ref(true);
+
   /**
    * Retrieves the current and deleted crew members from the database and updates the reactive values.
    *
@@ -72,8 +79,8 @@ export const useInventoryStore = defineStore("inventory", () => {
   const currentInventory = ref([{}]);
   const deletedInventory = ref([{}]);
 
-  const currentInventoryLength = computed(() => currentInventory.value.length);
-  const deletedInventoryLength = computed(() => deletedInventory.value.length);
+  const currentInventoryLength = computed(() => currentInventory.value.count);
+  const deletedInventoryLength = computed(() => deletedInventory.value.count);
 
   const inventoryLoading = ref(true);
 
@@ -82,9 +89,9 @@ export const useInventoryStore = defineStore("inventory", () => {
    *
    * @returns {Promise<void>} - A promise that resolves once the inventory data is retrieved and updated.
    */
-  const retrieveInventory = async () => {
+  const retrieveInventory = async (options) => {
     inventoryLoading.value = true;
-    const data = await readDataFromTable("inventory");
+    const data = await readDataFromTable("inventory", options);
     currentInventory.value = data.currentData;
     deletedInventory.value = data.deletedData;
     inventoryLoading.value = false;
@@ -117,19 +124,19 @@ export const useSuppliesStore = defineStore("supplies", () => {
   const currentSupplies = ref([{}]);
   const deletedSupplies = ref([{}]);
 
-  const currentSuppliesLength = computed(() => currentSupplies.value.length);
-  const deletedSuppliesLength = computed(() => deletedSupplies.value.length);
+  const currentSuppliesLength = computed(() => currentSupplies.value.count);
+  const deletedSuppliesLength = computed(() => deletedSupplies.value.count);
 
   const suppliesLoading = ref(true);
 
-/**
- * Fetches and updates the current and deleted supplies from the database.
- *
- * @returns {Promise<void>} - A promise that resolves once the supplies data is retrieved and updated.
- */
+  /**
+   * Fetches and updates the current and deleted supplies from the database.
+   *
+   * @returns {Promise<void>} - A promise that resolves once the supplies data is retrieved and updated.
+   */
   const retrieveSupplies = async () => {
     suppliesLoading.value = true;
-    const data = await readDataFromTable("supplies");
+    const data = await readDataFromTable("supplies", {itemsPerPage:10, page:1, keywords:""});
     currentSupplies.value = data.currentData;
     deletedSupplies.value = data.deletedData;
     suppliesLoading.value = false;
