@@ -10,6 +10,8 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 // Utilities
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
+import dotenv from "dotenv";
+
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -56,5 +58,12 @@ export default defineConfig({
   server: {
     port: 3000,
     watch: { usePolling: true },
+    proxy: {
+      "/api": {
+        target: dotenv.config().parsed.VITE_API_URL, // Backend server URL
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""), // Remove `/api` prefix when forwarding the request
+      },
+    },
   },
 });

@@ -4,7 +4,7 @@
   import warrenTech from '@/assets/warren_tech.png'
 </script>
 
-<template> 
+<template>
  <v-app class="bg-container">
     <v-container class="my-15">
       <v-row>
@@ -29,13 +29,13 @@
         <v-btn class="button-styles elevation-10" size="x-large" to="/account/login">Demo Login</v-btn>
       </v-col>
       <v-col>
-        <v-btn class="button-styles" size="x-large" to="/profile">Demo Profile</v-btn>
+        <v-btn class="button-styles" size="x-large" to="/account">Demo Profile</v-btn>
       </v-col>
       <v-col>
         <v-btn class="button-styles" size="x-large" to="/expired">Expiry Table</v-btn>
       </v-col>
       <v-col>
-        <v-btn class="button-styles" size="x-large" to="/update">Update</v-btn>
+        <v-btn class="button-styles" size="x-large" to="/account/items/new">Update</v-btn>
       </v-col>
       <v-col>
         <v-btn class="button-styles" size="x-large" to="/log">NFC logs</v-btn>
