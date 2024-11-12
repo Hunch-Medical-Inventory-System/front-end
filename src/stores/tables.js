@@ -89,7 +89,7 @@ export const useCrewStore = defineStore("crew", () => {
 export const useInventoryStore = defineStore("inventory", () => {
 
   const currentInventory = ref({data:[{}], count:0});
-  const deletedInventory = ref([{}]);
+  const deletedInventory = ref({ data: [{}], count: 0 });
 
   const currentInventoryLength = computed(() => currentInventory.value.count);
   const deletedInventoryLength = computed(() => deletedInventory.value.count);
@@ -133,8 +133,8 @@ export const useInventoryStore = defineStore("inventory", () => {
 
 export const useSuppliesStore = defineStore("supplies", () => {
 
-  const currentSupplies = ref([{}]);
-  const deletedSupplies = ref([{}]);
+  const currentSupplies = ref({ data: [{}], count: 0 });
+  const deletedSupplies = ref({ data: [{}], count: 0 });
 
   const currentSuppliesLength = computed(() => currentSupplies.value.count);
   const deletedSuppliesLength = computed(() => deletedSupplies.value.count);
@@ -168,9 +168,9 @@ export const useSuppliesStore = defineStore("supplies", () => {
    *
    * @returns {Promise<void>} - A promise that resolves once the supplies data is retrieved and updated.
    */
-  const retrieveSupplies = async () => {
+  const retrieveSupplies = async (options = {itemsPerPage: 10, page: 1, keywords: "",}) => {
     suppliesLoading.value = true;
-    const data = await readDataFromTable("supplies", {itemsPerPage:10, page:1, keywords:""});
+    const data = await readDataFromTable("supplies", options);
     currentSupplies.value = data.currentData;
     deletedSupplies.value = data.deletedData;
     suppliesLoading.value = false;

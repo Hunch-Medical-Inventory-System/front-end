@@ -1,3 +1,42 @@
+<script setup>
+  import { ref } from 'vue'
+  import { storeToRefs } from 'pinia'
+
+  import { useInventoryStore, useSuppliesStore } from '@/stores/tables'
+
+  const suppliesStore = useSuppliesStore()
+  const inventoryStore = useInventoryStore()
+
+  const { suppliesLoading, currentSupplies } = storeToRefs(suppliesStore)
+  const { inventoryLoading, currentInventory, currentInventoryLength } = storeToRefs(inventoryStore)
+
+  const search = ref('')
+  const itemsPerPage = ref(10)
+  const page = ref(1)
+  const alertMessage = ref(null)
+  const headers = ref([
+    { title: 'Id', key: 'id' },
+    { title: 'Supply Name', key: 'supply_id' },
+    { title: 'Expiry Date', key: 'expiry_date' },
+    { title: 'Created At', key: 'created_at' },
+    { title: 'Card Id', key: 'card_id' },
+  ])
+
+  /**
+   * Fetches the inventory from the store, passing the current search query,
+   * page number, and items per page as options.
+   *
+   * @returns {Promise<void>}
+   */
+  const loadInventory = async () => {
+    inventoryStore.retrieveInventory({
+      keywords: search.value,
+      page: page.value,
+      itemsPerPage: itemsPerPage.value
+    })
+  }
+</script>
+
 <template>
   <v-app class="bg-container">
     <v-container class="profile-container" rounded="10px">
@@ -49,45 +88,6 @@
     </v-container>
   </v-app>
 </template>
-
-<script setup>
-  import { ref } from 'vue'
-  import { storeToRefs } from 'pinia'
-
-  import { useInventoryStore, useSuppliesStore } from '@/stores/tables'
-
-  const suppliesStore = useSuppliesStore()
-  const inventoryStore = useInventoryStore()
-
-  const { suppliesLoading, currentSupplies } = storeToRefs(suppliesStore)
-  const { inventoryLoading, currentInventory, currentInventoryLength } = storeToRefs(inventoryStore)
-
-  const search = ref('')
-  const itemsPerPage = ref(10)
-  const page = ref(1)
-  const alertMessage = ref(null)
-  const headers = ref([
-    { title: 'Id', key: 'id' },
-    { title: 'Supply Name', key: 'supply_id' },
-    { title: 'Expiry Date', key: 'expiry_date' },
-    { title: 'Created At', key: 'created_at' },
-    { title: 'Card Id', key: 'card_id' },
-  ])
-
-  /**
-   * Fetches the inventory from the store, passing the current search query,
-   * page number, and items per page as options.
-   *
-   * @returns {Promise<void>}
-   */
-  const loadInventory = async () => {
-    inventoryStore.retrieveInventory({
-      keywords: search.value,
-      page: page.value,
-      itemsPerPage: itemsPerPage.value
-    })
-  }
-</script>
 
 <style scoped>
 .expired {
