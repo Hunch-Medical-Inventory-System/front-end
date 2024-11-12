@@ -104,7 +104,8 @@
   font-size: 14px;
   color: rgb(198, 180, 17);
   /* Items expiring within 30 days */
-}
+}  /* fortnite balls
+
 
 .profile-container {
   background-color: #000000;

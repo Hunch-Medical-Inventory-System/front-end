@@ -10,19 +10,30 @@ import { supabase } from "@/lib/supabaseClient";
    *  currentData: the data from the table that has not been deleted
    *  deletedData: the data from the table that has been deleted
    */
-const readDataFromTable = async (table, options = {itemsPerPage:10, page:1, keywords:""}) => {
-
+const readDataFromTable = async (table, options = { itemsPerPage: 100, page: 1, keywords: "" }) => {
   let currentData = [{}];
   let deletedData = [{}];
   try {
-    let currentResponse = await supabase.from(table)
+    let currentResponse = await supabase
+      .from(table)
       .select("*", { count: "exact" })
+      .order("id", { ascending: true })
       .eq("is_deleted", false)
-      .range(options.itemsPerPage * (options.page - 1), (options.itemsPerPage - 1) * options.page)
-    let deletedResponse = await supabase.from(table)
+      .range(
+        options.itemsPerPage * (options.page - 1),
+        options.itemsPerPage * options.page - 1
+      );
+
+    let deletedResponse = await supabase
+      .from(table)
       .select("*")
+      .order("id", { ascending: true })
       .eq("is_deleted", true)
-      .range(options.itemsPerPage * (options.page - 1), (options.itemsPerPage - 1) * options.page)
+      .range(
+        options.itemsPerPage * (options.page - 1),
+        options.itemsPerPage * options.page - 1
+      );
+
     currentData = currentResponse;
     deletedData = deletedResponse;
   } catch (error) {
@@ -30,7 +41,8 @@ const readDataFromTable = async (table, options = {itemsPerPage:10, page:1, keyw
   }
 
   return { currentData, deletedData };
-}
+};
+
 
 const updateDataInTable = async (table, id, data) => {
   const { error } = await supabase.from(table).update(data).eq("id", id);
@@ -76,7 +88,7 @@ export const useCrewStore = defineStore("crew", () => {
 
 export const useInventoryStore = defineStore("inventory", () => {
 
-  const currentInventory = ref([{}]);
+  const currentInventory = ref({data:[{}], count:0});
   const deletedInventory = ref([{}]);
 
   const currentInventoryLength = computed(() => currentInventory.value.count);
@@ -105,7 +117,7 @@ export const useInventoryStore = defineStore("inventory", () => {
   }
 
   onMounted(() => {
-    retrieveInventory();
+    retrieveInventory({itemsPerPage: 10, page: 1, keywords: ""});
   });
 
   return {
