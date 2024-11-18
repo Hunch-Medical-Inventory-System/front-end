@@ -1,55 +1,3 @@
-<template>
-  <v-app class="bg-container">
-    <v-container class="profile-container" rounded="10px">
-      <h1>Inventory Profile</h1>
-      <v-alert
-        v-if="alertMessage"
-        border="top"
-        class="mb-4 v_alert alert-pop-in"
-        prominent
-        type="warning"
-      >
-        {{ alertMessage }}
-      </v-alert>
-      <v-data-table-server
-        v-model:items-per-page="itemsPerPage"
-        v-model:page="page"
-        :headers="headers"
-        item-value="name"
-        :items="currentInventory.data"
-        :items-length="currentInventoryLength"
-        :loading="inventoryLoading"
-        @update:options="loadInventory"
-      >
-        <template #item="{ item }">
-          <tr>
-            <td>{{ item.id }}</td>
-            <td>{{ suppliesLoading ? 'Loading...' : currentSupplies.data.find(supply => supply.id === item.supply_id)?.item }}</td>
-            <td>{{ new Date(item.expiry_date).toLocaleDateString() }}</td>
-            <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
-            <td>{{ item.card_id }}</td>
-          </tr>
-        </template>
-
-        <template #tfoot>
-          <tr>
-            <td colspan="9">
-              <v-text-field
-                v-model="search"
-                class="ma-2"
-                density="compact"
-                hide-details
-                placeholder="Search inventory..."
-              />
-            </td>
-          </tr>
-        </template>
-      </v-data-table-server>
-
-    </v-container>
-  </v-app>
-</template>
-
 <script setup>
   import { ref } from 'vue'
   import { storeToRefs } from 'pinia'
@@ -87,33 +35,98 @@
       itemsPerPage: itemsPerPage.value
     })
   }
+
+  /**
+   * Determines the status of an item based on its expiry date.
+   *
+   * @param {string|Date} expiryDate - The expiry date of the item.
+   *
+   * @returns {string} - Returns "error" if the item is expired, "warning" if the item
+   *                     will expire in 3 days or less, and "success" if the item
+   *                     is not expiring soon.
+   */
+  const isExpired = (expiryDate) => {
+    const today = new Date()
+    const expiry = new Date(expiryDate)
+
+    const msInADay = 24 * 60 * 60 * 1000
+    const differenceInMs = expiry.getTime() - today.getTime()
+    const differenceInDays = differenceInMs / msInADay
+
+    if (expiry.getTime() < today.getTime()) {
+      return "error"
+    }
+    if (Math.floor(differenceInDays) <= 3) {
+      return "warning"
+    }
+    return "success"
+
+  }
 </script>
 
+<template>
+  <v-app class="bg-container">
+    <v-container class="rounded-lg">
+
+      <v-alert
+        v-if="alertMessage"
+        border="top"
+        class="mb-4 v_alert alert-pop-in"
+        prominent
+        type="warning"
+      >
+        {{ alertMessage }}
+      </v-alert>
+
+      <v-data-table-server
+        v-model:items-per-page="itemsPerPage"
+        v-model:page="page"
+        :headers="headers"
+        item-value="name"
+        :items="currentInventory.data"
+        :items-length="currentInventoryLength"
+        :loading="inventoryLoading"
+        @update:options="loadInventory"
+      >
+        <template v-slot:top>
+          <v-toolbar class="rounded-lg">
+            <v-toolbar-title>Inventory Table</v-toolbar-title>
+          </v-toolbar>
+        </template>
+        <template #item="{ item }">
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ suppliesLoading ? 'Loading...' : currentSupplies.data.find(supply => supply.id === item.supply_id)?.item }}</td>
+            <td>
+              <v-chip :color="isExpired(item.expiry_date)">
+                {{ item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A' }}
+              </v-chip>
+            </td>
+            <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
+            <td>{{ item.card_id }}</td>
+          </tr>
+        </template>
+
+        <template #tfoot>
+          <tr>
+            <td colspan="9">
+              <v-text-field
+                v-model="search"
+                class="ma-2"
+                density="compact"
+                hide-details
+                placeholder="Search inventory..."
+              />
+            </td>
+          </tr>
+        </template>
+      </v-data-table-server>
+
+    </v-container>
+  </v-app>
+</template>
+
 <style scoped>
-.expired {
-  background-color: hwb(355 4% 9%);
-  /* Expired items */
-}
-
-.about-to-expire {
-  background-color: hwb(39 6% 14%);
-  /* Items expiring within 7 days */
-}
-
-.expiring-soon {
-  font-size: 14px;
-  color: rgb(198, 180, 17);
-  /* Items expiring within 30 days */
-}
-
-.profile-container {
-  background-color: #000000;
-  border-radius: 10px;
-  padding: 2em;
-  color: #ffffff;
-  max-width: 80%;
-  margin: 0 auto;
-}
 
 .bg-container {
   background-image: url('@/assets/bg.png');
@@ -124,7 +137,6 @@
 
 .v_alert {
   background-color: hwb(0 21% 27% / 0.897) 55%, 47%, 0.897;
-  ;
 }
 
 .alert-pop-in {
@@ -142,4 +154,5 @@
     transform: scale(1);
   }
 }
+
 </style>

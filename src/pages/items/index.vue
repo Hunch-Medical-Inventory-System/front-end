@@ -3,52 +3,75 @@
   import { storeToRefs } from 'pinia'
 
   import { useSuppliesStore } from '@/stores/tables'
+  import NewSupply from '@/components/supplies/NewSupply.vue';
+  import DeleteRowConfirmation from '@/components/DeleteRowConfirmation.vue';
 
   const suppliesStore = useSuppliesStore()
 
   const { suppliesLoading, currentSupplies, currentSuppliesLength } = storeToRefs(suppliesStore)
 
+  const suppliesItemId = ref(0);
+
   const search = ref('')
   const itemsPerPage = ref(10)
   const page = ref(1)
   const alertMessage = ref(null)
+  const expanded = ref([])
   const headers = ref([
     { title: 'Id', key: 'id', sortable: false },
-    { title: 'Type', key: 'supply_id', sortable: false },
-    { title: 'Item Name', key: 'expiry_date', sortable: false },
-    { title: 'Strength Or Volume', key: 'card_id', sortable: false },
-    { title: 'Route Of Use', key: 'card_id', sortable: false },
-    { title: 'Quantity In Pack', key: 'card_id', sortable: false },
-    { title: 'Possible Side Effects', key: 'card_id', sortable: false },
-    { title: 'Location', key: 'card_id', sortable: false },
+    { title: 'Type', key: 'type', sortable: false },
+    { title: 'Item Name', key: 'item', sortable: false },
+    { title: 'Strength/Volume', key: 'strength_or_volume', sortable: false },
+    { title: 'Route Of Use', key: 'route_of_use', sortable: false },
+    { title: 'Quantity In Pack', key: 'quantity_in_pack', sortable: false },
+    { title: 'Location', key: 'location', sortable: false },
     { title: 'Created At', key: 'created_at', sortable: false },
     { title: 'Actions', key: 'actions', align: 'center', sortable: false },
-    { text: 'test', value: 'data-table-expand' },
+    { title: 'Possible Side Effects', key: 'data-table-expand', value: 'data-table-expand', sortable: false },
   ])
 
-/**
- * Loads the inventory data from the inventory store.
- * It uses the current search query, page number, and number of items per page
- * to retrieve the relevant inventory data.
- *
- * @returns {Promise<void>}
- */
+  const isOpenedNew = ref(false)
+  const isOpenedEdit = ref(false)
+  const isOpenedDelete = ref(false)
+
+  const toggleNew = () => {
+    isOpenedNew.value = !isOpenedNew.value
+  }
+  const toggleEdit = (id) => {
+    suppliesItemId.value = id
+    isOpenedEdit.value = !isOpenedEdit.value
+  }
+
+  const toggleDelete = (id) => {
+    suppliesItemId.value = id
+    isOpenedDelete.value = !isOpenedDelete.value
+  }
+
+  const closeNew = () => {
+    isOpenedNew.value = false
+    loadSupplies()
+  }
+  const closeEdit = () => {
+    isOpenedEdit.value = false
+    loadSupplies()
+  }
+  const closeDelete = () => {
+    isOpenedDelete.value = false
+    loadSupplies()
+  }
   const loadSupplies = async () => {
     suppliesStore.retrieveSupplies({
       keywords: search.value,
       page: page.value,
       itemsPerPage: itemsPerPage.value
     })
-    console.log(currentSupplies.value)
   }
-  const updateSupplies = async () => {
-    suppliesStore.retrieveSupplies()
-  }
+
 </script>
 
 <template>
   <v-app class="bg-container">
-    <v-container class="profile-container" rounded="10px">
+    <v-container class="rounded-lg">
       <v-alert
         v-if="alertMessage"
         border="top"
@@ -61,62 +84,65 @@
       <v-data-table-server
         v-model:items-per-page="itemsPerPage"
         v-model:page="page"
+        v-model:expanded="expanded"
         :headers="headers"
-        item-value="name"
         :items="currentSupplies.data"
         :items-length="currentSuppliesLength"
         :loading="suppliesLoading"
-        @update:options="loadSupplies"
-        :single-expanded="true"
         show-expand
+        item-value="id"
+        @update:options="loadSupplies"
       >
         <template v-slot:top>
           <v-toolbar class="rounded-lg">
             <v-toolbar-title>Supply Table</v-toolbar-title>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              @click="toggleNew"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
           </v-toolbar>
         </template>
-        <template #item="{ item }">
+
+        <template #item.created_at="{ item }">
           <tr>
-            <td>{{ item.id }}</td>
-            <td>{{ item.type }}</td>
-            <td>{{ item.item }}</td>
-            <td>{{ item.strength_or_volume }}</td>
-            <td>{{ item.route_of_use }}</td>
-            <td>{{ item.quantity_in_pack }}</td>
-            <!-- <td>{{ item.possible_side_effects }}</td> -->
-            <td>{{ item.location }}</td>
             <td>{{ new Date(item.created_at).toLocaleDateString() }}</td>
-            <td>{{ item.card_id }}</td>
+          </tr>
+        </template>
+
+        <template #item.actions="{ item }">
+          <tr>
             <td>
               <v-container class="">
                 <v-btn
+                  @click="toggleEdit(item.id)"
                   color="primary"
                   size="small"
                 >
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
                 <v-btn
+                  @click="toggleDelete(item.id)"
                   color="error"
                   size="small"
                 >
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-container>
-
             </td>
           </tr>
         </template>
-        <!-- expand column -->
-        <template v-slot:item.data-table-expand="{ item, isExpanded, expand }">
-          <v-btn @click="expand(true)" v-if="item.canExpand && !isExpanded">Expand</v-btn>
-          <v-btn @click="expand(false)" v-if="item.canExpand && isExpanded">close</v-btn>
-        </template>
 
-        <!-- expand item/row -->
-        <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length">
-            <pre>{{item}}</pre>
-          </td>
+        <!-- Expanded content -->
+        <template #expanded-row="{ columns, item }">
+          <tr>
+            <td :colspan="columns.length">
+              {{item.possible_side_effects}}
+            </td>
+          </tr>
+
         </template>
 
         <template #tfoot>
@@ -134,36 +160,75 @@
         </template>
       </v-data-table-server>
 
+      <v-dialog
+        v-model="isOpenedNew"
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <v-card class="rounded-lg">
+          <v-toolbar class="rounded-lg">
+            <v-toolbar-title>Create Item</v-toolbar-title>
+            <v-spacer />
+            <v-btn
+              icon
+              @click="toggleNew"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <NewSupply @close="closeNew" />
+        </v-card>
+      </v-dialog>
+
+      <v-dialog
+        v-model="isOpenedEdit"
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <v-card class="rounded-lg">
+          <v-toolbar class="rounded-lg">
+            <v-toolbar-title>Edit Item</v-toolbar-title>
+            <v-spacer />
+            <v-btn
+              icon
+              @click="toggleEdit(suppliesItemId)"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <EditSupply :id="suppliesItemId" @close="closeEdit" />
+        </v-card>
+      </v-dialog>
+
+      <v-dialog
+        v-model="isOpenedDelete"
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <v-card class="rounded-lg">
+          <v-toolbar class="rounded-lg">
+            <v-toolbar-title>Delete Item</v-toolbar-title>
+            <v-spacer />
+            <v-btn
+              icon
+              @click="toggleDelete(suppliesItemId)"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <DeleteRowConfirmation
+            :id="suppliesItemId"
+            :table="'supplies'"
+            @close="closeDelete"
+          />
+        </v-card>
+      </v-dialog>
+
     </v-container>
   </v-app>
 </template>
 
 <style scoped>
-.expired {
-  background-color: hwb(355 4% 9%);
-  /* Expired items */
-}
-
-.about-to-expire {
-  background-color: hwb(39 6% 14%);
-  /* Items expiring within 7 days */
-}
-
-.expiring-soon {
-  font-size: 14px;
-  color: rgb(198, 180, 17);
-  /* Items expiring within 30 days */
-}
-
-
-.profile-container {
-  background-color: #000000;
-  border-radius: 10px;
-  padding: 2em;
-  color: #ffffff;
-  max-width: 80%;
-  margin: 0 auto;
-}
 
 .bg-container {
   background-image: url('@/assets/bg.png');
@@ -174,7 +239,6 @@
 
 .v_alert {
   background-color: hwb(0 21% 27% / 0.897) 55%, 47%, 0.897;
-  ;
 }
 
 .alert-pop-in {

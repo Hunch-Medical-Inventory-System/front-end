@@ -1,55 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed, onMounted } from "vue";
-import { supabase } from "@/lib/supabaseClient";
-
-  /**
-   * Reads data from a Supabase table and separates it into
-   * current (non-deleted) and deleted data.
-   * @param {string} table - The name of the table to read from
-   * @returns {Promise<{ currentData: object[], deletedData: object[] }>}
-   *  currentData: the data from the table that has not been deleted
-   *  deletedData: the data from the table that has been deleted
-   */
-const readDataFromTable = async (table, options = { itemsPerPage: 100, page: 1, keywords: "" }) => {
-  let currentData = [{}];
-  let deletedData = [{}];
-  try {
-    let currentResponse = await supabase
-      .from(table)
-      .select("*", { count: "exact" })
-      .order("id", { ascending: true })
-      .eq("is_deleted", false)
-      .range(
-        options.itemsPerPage * (options.page - 1),
-        options.itemsPerPage * options.page - 1
-      );
-
-    let deletedResponse = await supabase
-      .from(table)
-      .select("*")
-      .order("id", { ascending: true })
-      .eq("is_deleted", true)
-      .range(
-        options.itemsPerPage * (options.page - 1),
-        options.itemsPerPage * options.page - 1
-      );
-
-    currentData = currentResponse;
-    deletedData = deletedResponse;
-  } catch (error) {
-    console.error(error);
-  }
-
-  return { currentData, deletedData };
-};
-
-
-const updateDataInTable = async (table, id, data) => {
-  const { error } = await supabase.from(table).update(data).eq("id", id);
-  if (error) {
-    console.error(error);
-  }
-}
+import { readDataFromTable, readRowFromTable } from "@/lib/supabaseClient";
 
 export const useCrewStore = defineStore("crew", () => {
 
@@ -94,6 +45,13 @@ export const useInventoryStore = defineStore("inventory", () => {
   const currentInventoryLength = computed(() => currentInventory.value.count);
   const deletedInventoryLength = computed(() => deletedInventory.value.count);
 
+  const inventoryItemId = ref(0);
+  const inventoryItem = ref({
+    item: "",
+    location: "",
+    quantity: 0
+  });
+
   const inventoryLoading = ref(true);
 
   /**
@@ -112,12 +70,16 @@ export const useInventoryStore = defineStore("inventory", () => {
   const updateInventoryRow = async (id) => {
     const { error } = await fetch("inventory", id);
     if (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
   onMounted(() => {
     retrieveInventory({itemsPerPage: 10, page: 1, keywords: ""});
+  });
+
+  watch(inventoryItemId, async (newId) => {
+    inventoryItem.value = await readRowFromTable("supplies", parseInt(newId));
   });
 
   return {
@@ -139,27 +101,16 @@ export const useSuppliesStore = defineStore("supplies", () => {
   const currentSuppliesLength = computed(() => currentSupplies.value.count);
   const deletedSuppliesLength = computed(() => deletedSupplies.value.count);
 
+  // const suppliesItemId = ref(0);
   // const suppliesItem = ref({
-  //   type: '',
-  //   item: '',
-  //   strength_or_volume: '',
-  //   route_of_use: '',
-  //   quantity_in_pack: '',
-  //   possible_side_effects: '',
-  //   location: '',
+  //   item: "",
+  //   location: "",
+  //   possible_side_effects:"",
+  //   quantity_in_pack: "",
+  //   route_of_use: "",
+  //   strength_or_volume: "",
+  //   type: "",
   // });
-
-  const suppliesItem = ref({
-    item: "Fluconazole (Diflucan)",
-    location: "B2",
-    possible_side_effects:
-      "Headache, dizziness, nausea, abdominal pain, vomiting, diarrhea, rash",
-    quantity_in_pack: "5 tablet",
-    route_of_use: "Oral",
-    strength_or_volume: "150 mg",
-    type: "Antifungal",
-  });
-  const suppliesItemId = ref(1);
 
   const suppliesLoading = ref(true);
 
@@ -180,12 +131,14 @@ export const useSuppliesStore = defineStore("supplies", () => {
     retrieveSupplies();
   });
 
+  // watch(suppliesItemId, async newId => {
+  //   suppliesItem.value= await readRowFromTable("supplies", parseInt(newId));
+  // });
+
   return {
     suppliesLoading,
     currentSupplies,
     deletedSupplies,
-    suppliesItem,
-    suppliesItemId,
     currentSuppliesLength,
     deletedSuppliesLength,
     retrieveSupplies
