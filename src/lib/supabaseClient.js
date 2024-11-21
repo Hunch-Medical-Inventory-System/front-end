@@ -43,7 +43,7 @@ export const readDataFromTable = async (
 
     let deletedResponse = await supabase
       .from(table)
-      .select("*")
+      .select("*", { count: "exact" })
       .order("id", { ascending: true })
       .eq("is_deleted", true)
       .range(
