@@ -1,13 +1,22 @@
 <template>
   <v-app>
-    <v-main>
-      <router-view />
-    </v-main>
-
+    <NavBar />
+    <!-- <v-row class="bg-container"> -->
+      <v-main>
+          <router-view />
+      </v-main>
+    <!-- </v-row> -->
     <AppFooter />
   </v-app>
 </template>
 
-<script setup>
-  //
-</script>
+<style scoped>
+
+.bg-container {
+  background-image: url('@/assets/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+</style>

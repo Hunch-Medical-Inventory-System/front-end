@@ -2,40 +2,6 @@ import { defineStore } from "pinia";
 import { ref, computed, onMounted } from "vue";
 import { readDataFromTable, readRowFromTable } from "@/lib/supabaseClient";
 
-export const useCrewStore = defineStore("crew", () => {
-
-  const currentCrewMembers = ref([{}]);
-  const deletedCrewMembers = ref([{}]);
-
-  const currentCrewMembersLength = computed(() => currentCrewMembers.value.length);
-  const deletedCrewMembersLength = computed(() => deletedCrewMembers.value.length);
-
-  const crewLoading = ref(true);
-
-  /**
-   * Retrieves the current and deleted crew members from the database and updates the reactive values.
-   *
-   * @returns {Promise<void>} - A promise that resolves once the crew members data is retrieved and updated.
-   */
-  const retrieveCrewMembers = async () => {
-    const data = await readDataFromTable("crew");
-    currentCrewMembers.value = data.currentData;
-    deletedCrewMembers.value = data.deletedData;
-};
-
-  onMounted(() => {
-    retrieveCrewMembers();
-  });
-
-  return {
-    crewLoading,
-    currentCrewMembers,
-    deletedCrewMembers,
-    currentCrewMembersLength,
-    deletedCrewMembersLength,
-    retrieveCrewMembers
-  };
-});
 
 export const useInventoryStore = defineStore("inventory", () => {
 
@@ -44,13 +10,6 @@ export const useInventoryStore = defineStore("inventory", () => {
 
   const currentInventoryLength = computed(() => currentInventory.value.count);
   const deletedInventoryLength = computed(() => deletedInventory.value.count);
-
-  const inventoryItemId = ref(0);
-  const inventoryItem = ref({
-    item: "",
-    location: "",
-    quantity: 0
-  });
 
   const inventoryLoading = ref(true);
 
@@ -67,19 +26,8 @@ export const useInventoryStore = defineStore("inventory", () => {
     inventoryLoading.value = false;
   };
 
-  const updateInventoryRow = async (id) => {
-    const { error } = await fetch("inventory", id);
-    if (error) {
-      console.error(error);
-    }
-  }
-
   onMounted(() => {
     retrieveInventory({itemsPerPage: 10, page: 1, keywords: ""});
-  });
-
-  watch(inventoryItemId, async (newId) => {
-    inventoryItem.value = await readRowFromTable("supplies", parseInt(newId));
   });
 
   return {
@@ -101,17 +49,6 @@ export const useSuppliesStore = defineStore("supplies", () => {
   const currentSuppliesLength = computed(() => currentSupplies.value.count);
   const deletedSuppliesLength = computed(() => deletedSupplies.value.count);
 
-  // const suppliesItemId = ref(0);
-  // const suppliesItem = ref({
-  //   item: "",
-  //   location: "",
-  //   possible_side_effects:"",
-  //   quantity_in_pack: "",
-  //   route_of_use: "",
-  //   strength_or_volume: "",
-  //   type: "",
-  // });
-
   const suppliesLoading = ref(true);
 
   /**
@@ -131,10 +68,6 @@ export const useSuppliesStore = defineStore("supplies", () => {
     retrieveSupplies();
   });
 
-  // watch(suppliesItemId, async newId => {
-  //   suppliesItem.value= await readRowFromTable("supplies", parseInt(newId));
-  // });
-
   return {
     suppliesLoading,
     currentSupplies,
@@ -144,3 +77,79 @@ export const useSuppliesStore = defineStore("supplies", () => {
     retrieveSupplies
   };
 })
+
+
+export const useCrewStore = defineStore("crew", () => {
+  const currentCrew = ref({ data: [{}], count: 0 });
+  const deletedCrew = ref({ data: [{}], count: 0 });
+
+  const currentCrewLength = computed(() => currentCrew.value.count);
+  const deletedCrewLength = computed(() => deletedCrew.value.count);
+
+  const crewLoading = ref(true);
+
+  /**
+   * Fetches and updates the current and deleted crew from the database.
+   *
+   * @returns {Promise<void>} - A promise that resolves once the crew data is retrieved and updated.
+   */
+  const retrieveCrew = async (options = {itemsPerPage: 10, page: 1, keywords: "",}) => {
+    crewLoading.value = true;
+    const data = await readDataFromTable("crew", options);
+    currentCrew.value = data.currentData;
+    deletedCrew.value = data.deletedData;
+    crewLoading.value = false;
+  };
+
+  onMounted(() => {
+    retrieveCrew();
+  });
+
+  return {
+    crewLoading,
+    currentCrew,
+    deletedCrew,
+    currentCrewLength,
+    deletedCrewLength,
+    retrieveCrew
+  };
+})
+
+
+export const useLogsStore = defineStore("logs", () => {
+  const currentLogs = ref({ data: [{}], count: 0 });
+  const deletedLogs = ref({ data: [{}], count: 0 });
+
+  const currentLogsLength = computed(() => currentLogs.value.count);
+  const deletedLogsLength = computed(() => deletedLogs.value.count);
+
+  const logsLoading = ref(true);
+
+  /**
+   * Fetches and updates the current and deleted logs from the database.
+   *
+   * @returns {Promise<void>} - A promise that resolves once the logs data is retrieved and updated.
+   */
+  const retrieveLogs = async (
+    options = { itemsPerPage: 10, page: 1, keywords: "" }
+  ) => {
+    logsLoading.value = true;
+    const data = await readDataFromTable("logs", options);
+    currentLogs.value = data.currentData;
+    deletedLogs.value = data.deletedData;
+    logsLoading.value = false;
+  };
+
+  onMounted(() => {
+    retrieveLogs();
+  });
+
+  return {
+    logsLoading,
+    currentLogs,
+    deletedLogs,
+    currentLogsLength,
+    deletedLogsLength,
+    retrieveLogs,
+  };
+});

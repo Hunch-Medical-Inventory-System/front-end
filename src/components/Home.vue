@@ -6,7 +6,7 @@
 
 <template>
  <v-app class="bg-container">
-    <v-container class="my-15">
+    <v-row class="my-15">
       <v-row>
         <v-container class="justify-center">
           <v-row class="title2 justify-center text-center" style="margin-bottom: 0;">Medical Based</v-row>
@@ -45,7 +45,7 @@
       </v-col>
     </v-row>
     <!-- </v-col> -->
-  </v-container>
+  </v-row>
 </v-app>
 </template>
 
