@@ -23,7 +23,7 @@
   ])
 
   /**
-   * Fetches the inventory from the store, passing the current search query,
+   * Fetches the inventory from the store, passing the deleted search query,
    * page number, and items per page as options.
    *
    * @returns {Promise<void>}
@@ -90,13 +90,13 @@
       >
         <template v-slot:top>
           <v-toolbar class="rounded-lg">
-            <v-toolbar-title>Taken Inventory Table</v-toolbar-title>
+            <v-toolbar-title>Inventory Table</v-toolbar-title>
           </v-toolbar>
         </template>
         <template #item="{ item }">
           <tr>
             <td>{{ item.id }}</td>
-            <td>{{ suppliesLoading ? 'Loading...' : currentSupplies.data.find(supply => supply.id === item.supply_id)?.item }}</td>
+            <td>{{ suppliesLoading ? 'Loading...' : deletedSupplies.data.find(supply => supply.id === item.supply_id)?.item }}</td>
             <td>
               <v-chip :color="isExpired(item.expiry_date)">
                 {{ item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A' }}
