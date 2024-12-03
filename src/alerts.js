@@ -23,13 +23,13 @@ async function getInventoryUpdates() {
   // Query to get expired items
   const { data: expiredItems } = await supabase
     .from('inventory')
-    .select('*, supplies(supply_name)')
+    .select('*')
     .lt('expiry_date', today.toISOString());
 
   // Query to get expiring items
   const { data: expiringItems } = await supabase
     .from('inventory')
-    .select('*, supplies(supply_name)')
+    .select('*')
     .gte('expiry_date', today.toISOString())
     .lte('expiry_date', threeDaysLater.toISOString());
 
