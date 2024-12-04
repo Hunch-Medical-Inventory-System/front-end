@@ -10,61 +10,103 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'jjshunch@gmail.com',
-    pass: 'ride rniq eqhj ktri',
+    pass: 'ride rniq eqhj ktri', 
   },
 });
 
-// Function to Fetch Expired and Expiring Items
+
 async function getInventoryUpdates() {
   const today = new Date();
   const threeDaysLater = new Date(today);
   threeDaysLater.setDate(today.getDate() + 3);
 
-  // Query to get expired items
-  const { data: expiredItems } = await supabase
+  // Fetch expired items
+  const { data: expiredItems, error: expiredError } = await supabase
     .from('inventory')
-    .select('*, supplies(supply_name)')
+    .select('id, expiry_date, supply_id') 
     .lt('expiry_date', today.toISOString());
 
-  // Query to get expiring items
-  const { data: expiringItems } = await supabase
+  // Fetch expiring items
+  const { data: expiringItems, error: expiringError } = await supabase
     .from('inventory')
-    .select('*, supplies(supply_name)')
+    .select('id, expiry_date, supply_id') 
     .gte('expiry_date', today.toISOString())
     .lte('expiry_date', threeDaysLater.toISOString());
 
-  return { expiredItems, expiringItems };
+  if (expiredError || expiringError) {
+    console.error('Error fetching data:', expiredError || expiringError);
+    return { expiredItems: [], expiringItems: [] }; 
+  }
+
+ 
+  const { data: supplies, error: suppliesError } = await supabase
+    .from('supplies')
+    .select('id, item'); 
+
+  if (suppliesError) {
+    console.error('Error fetching supplies:', suppliesError);
+    return { expiredItems, expiringItems }; 
+  }
+
+  const supplyMap = Object.fromEntries(supplies.map(s => [s.id, s.item]));
+
+  // Attach supply names to items
+  const attachSupplyNames = items =>
+    items.map(item => ({
+      ...item,
+      supply_name: supplyMap[item.supply_id] || 'Unknown',
+    }));
+
+  return {
+    expiredItems: attachSupplyNames(expiredItems),
+    expiringItems: attachSupplyNames(expiringItems),
+  };
 }
 
-// Function to Send Email
+
 async function sendEmail() {
   const { expiredItems, expiringItems } = await getInventoryUpdates();
 
   const emailContent = `
-    <h2>Inventory Updates</h2>
-    <h3>Expired Items:</h3>
-    <ul>
-      ${expiredItems.map(item => `<li>${item.supply_name} (Expiry Date: ${item.expiry_date})</li>`).join('')}
-    </ul>
-    <h3>Expiring Soon (Next 3 Days):</h3>
-    <ul>
-      ${expiringItems.map(item => `<li>${item.supply_name} (Expiry Date: ${item.expiry_date})</li>`).join('')}
-    </ul>
+  <h2>Inventory Updates</h2>
+  <h3>Expired Items:</h3>
+  <ul>
+    ${expiredItems
+      .map(
+        item =>
+          `<li>${item.supply_name} (Expiry Date: ${new Date(item.expiry_date).toLocaleDateString()})</li>`
+      )
+      .join('')}
+  </ul>
+  <h3>Expiring Soon (Next 3 Days):</h3>
+  <ul>
+    ${expiringItems
+      .map(
+        item =>
+          `<li>${item.supply_name} (Expiry Date: ${new Date(item.expiry_date).toLocaleDateString()})</li>`
+      )
+      .join('')}
+  </ul>
   `;
 
   const mailOptions = {
     from: 'jjshunch@gmail.com',
-    to: '2178956@jeffcoschools.us',
+    to: '2178956@jeffcoschools.us, 2112376@jeffcoschools.us',
     subject: 'Inventory Expiry Notification',
     html: emailContent,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully!');
+  } catch (error) {
+    console.error('Failed to send email:', error);
+  }
 }
 
-// Schedule the Task to Run Every 5 Minutes
+// 5 minute timer for testing
 cron.schedule('*/5 * * * *', async () => {
-  console.log('Sending inventory update email...');
+  console.log('Snding inventory update email...');
   await sendEmail();
   console.log('Email sent!');
 });

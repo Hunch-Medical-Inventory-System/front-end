@@ -2,7 +2,7 @@
   import { ref } from 'vue'
   import { storeToRefs } from 'pinia'
 
-  import { useInventoryStore, useSuppliesStore } from '@/stores/tables'
+  import { useInventol,ryStore, useSuppliesStore } from '@/stores/tables'
 
   const suppliesStore = useSuppliesStore()
   const inventoryStore = useInventoryStore()
