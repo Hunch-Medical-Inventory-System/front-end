@@ -68,6 +68,7 @@ async function sendEmail() {
   const { expiredItems, expiringItems } = await getInventoryUpdates();
 
   const emailContent = `
+  <img src="/workspaces/front-end/src/assets/header.png" alt="Header Image" style="width: 100%; max-height: 300px; object-fit: cover;" />
   <h2>Inventory Updates</h2>
   <h3>Expired Items:</h3>
   <ul>

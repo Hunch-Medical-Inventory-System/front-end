@@ -80,7 +80,7 @@
 }
 
 .bg-container {
-  background-image: url('@/assets/bg.jpg');
+  background-image: url('@/assets/beauty.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
