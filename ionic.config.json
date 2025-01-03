@@ -1,0 +1,7 @@
+{
+  "name": "vuetify-project",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
