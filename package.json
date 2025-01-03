@@ -18,15 +18,14 @@
     "dotenv": "^16.4.5",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.16",
-    "roboto-fontface": "*",
-    "three": "^0.171.0",
+    "roboto-fontface": "^0.10.0",
+    "three": "^0.169.0",
     "vue": "^3.4.31",
     "vuetify": "^3.6.11"
   },
   "devDependencies": {
     "@types/estree": "^1.0.6",
     "@vitejs/plugin-vue": "^5.0.5",
-    "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-config-vuetify": "^1.0.0",
     "eslint-plugin-import": "^2.29.1",
