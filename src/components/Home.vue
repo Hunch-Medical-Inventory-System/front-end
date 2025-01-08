@@ -26,7 +26,7 @@
     </v-row>
     <v-row class="text-center justify-center">
       <v-col>
-        <v-btn class="button-styles elevation-10" size="x-large" to="/account/login">Demo Login</v-btn>
+        <v-btn class="button-styles" size="x-large" to="/account/login" exact>Demo Login</v-btn>
       </v-col>
       <v-col>
         <v-btn class="button-styles" size="x-large" to="/account">Demo Profile</v-btn>

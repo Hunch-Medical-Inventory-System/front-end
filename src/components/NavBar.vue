@@ -1,65 +1,42 @@
 <script setup>
+  import { ref } from 'vue'
+
   import logo from '@/assets/logo.png'
+
+  const drawer = ref(false)
 </script>
 
 <template>
 
-  <v-system-bar color="deep-purple darken-3"></v-system-bar>
+  <v-app-bar
+    color="primary"
+    prominent
+  >
+    <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" v-if="$vuetify.display.mdAndDown"></v-app-bar-nav-icon>
+    <v-toolbar-title>Medical Inventory</v-toolbar-title>
 
-    <v-app-bar
-      color="deep-purple accent-4"
-      dark
-      prominent
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+    <v-spacer></v-spacer>
 
-      <v-toolbar-title>My files</v-toolbar-title>
+    <template v-if="!$vuetify.display.mdAndDown">
+      <v-btn to="/">Home</v-btn>
+      <v-btn to="/account" exact>Demo Profile Table</v-btn>
+      <v-btn to="/account/available" exact>Available Table</v-btn>
+      <v-btn to="/items" exact>Supplies Table</v-btn>
+      <v-btn to="/items/logs" exact>Logs Table</v-btn>
 
-      <v-spacer></v-spacer>
+    </template>
+  </v-app-bar>
 
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-filter</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-navigation-drawer
-      v-model="drawer"
-      absolute
-      bottom
-      temporary
-    >
-      <v-list
-        nav
-        dense
-      >
-        <v-list-item-group
-          v-model="group"
-          active-class="deep-purple--text text--accent-4"
-        >
-          <v-list-item>
-            <v-list-item-title>Foo</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item>
-            <v-list-item-title>Bar</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item>
-            <v-list-item-title>Fizz</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item>
-            <v-list-item-title>Buzz</v-list-item-title>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </v-navigation-drawer>
+  <v-navigation-drawer
+    v-model="drawer"
+    temporary
+  >
+    <v-list>
+      <v-list-item><v-btn to="/" exact>Home</v-btn></v-list-item>
+      <v-list-item><v-btn to="/account" exact>Demo Profile Table</v-btn></v-list-item>
+      <v-list-item><v-btn to="/account/available" exact>Available Table</v-btn></v-list-item>
+      <v-list-item><v-btn to="/items" exact>Supplies Table</v-btn></v-list-item>
+      <v-list-item><v-btn to="/items/logs" exact>Logs Table</v-btn></v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
