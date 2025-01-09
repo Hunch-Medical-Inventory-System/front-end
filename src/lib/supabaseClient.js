@@ -1,5 +1,6 @@
 // supabaseClient.js
 import { createClient } from "@supabase/supabase-js";
+import { exp } from "three/tsl";
 
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -7,29 +8,40 @@ export const supabase = createClient(
 );
 
 
-// Supabase read functions
-
-/**
- * Reads data from a Supabase table and separates it into
- * current (non-deleted) and deleted data.
- * Uses supabaseClient
- *
- * @param {string} table - The name of the table to read from
- * @param {{ itemsPerPage: number, page: number, keywords: string }} [options] -
- *   Optional options object.
- *   - itemsPerPage: The number of items to retrieve per page.
- *   - page: The page number to retrieve.
- *   - keywords: The keywords to search for.
- * @returns {Promise<{ currentData: object[], deletedData: object[] }>}
- *   - currentData: the data from the table that has not been deleted
- *   - deletedData: the data from the table that has been deleted
- */
 export const readDataFromTable = async (
   table,
   options = { itemsPerPage: 100, page: 1, keywords: "" }
 ) => {
+
+  let data = [{}];
+
+  try {
+    let response = await supabase
+      .from(table)
+      .select("*", { count: "exact" })
+      .order("id", { ascending: true })
+      .range(
+        options.itemsPerPage * (options.page - 1),
+        options.itemsPerPage * options.page - 1
+      );
+
+    data = response;
+
+  } catch (error) {
+    console.error(error);
+  }
+
+  return data;
+};
+
+export const readDeletableDataFromTable = async (
+  table,
+  options = { itemsPerPage: 100, page: 1, keywords: "" }
+) => {
+
   let currentData = [{}];
   let deletedData = [{}];
+
   try {
     let currentResponse = await supabase
       .from(table)
@@ -53,11 +65,61 @@ export const readDataFromTable = async (
 
     currentData = currentResponse;
     deletedData = deletedResponse;
+
   } catch (error) {
     console.error(error);
   }
 
   return { currentData, deletedData };
+};
+
+export const readExpirableDataFromTable = async (
+  table,
+  options = { itemsPerPage: 100, page: 1, keywords: "" }
+) => {
+
+  let currentData = [{}]
+  let deletedData = [{}]
+  let expiredData = [{}]
+
+  try {
+    let currentResponse = await supabase
+      .from(table)
+      .select("*", { count: "exact" })
+      .order("id", { ascending: true })
+      .eq("is_deleted", false)
+      .lt("expiration_date", new Date().toISOString())
+      .range(
+        options.itemsPerPage * (options.page - 1),
+        options.itemsPerPage * options.page - 1
+      )
+
+    let deletedResponse = await supabase
+      .from(table)
+      .select("*", { count: "exact" })
+      .order("id", { ascending: true })
+      .eq("is_deleted", true)
+      .range(
+        options.itemsPerPage * (options.page - 1),
+        options.itemsPerPage * options.page - 1
+      )
+
+    let expiredResponse = await supabase
+      .from(table)
+      .select("*")
+      .order("id", { ascending: true })
+      .eq("is_deleted", false)
+      .gt("expiration_date", new Date().toISOString())
+
+    currentData = currentResponse
+    deletedData = deletedResponse
+    expiredData = expiredResponse
+
+  } catch (error) {
+    console.error(error)
+  }
+
+  return { currentData, deletedData, expiredData }
 };
 
 /**

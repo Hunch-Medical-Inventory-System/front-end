@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed, onMounted } from "vue";
-import { readDataFromTable, readRowFromTable } from "@/lib/supabaseClient";
+import { readDataFromTable, readDeletableDataFromTable, readExpirableDataFromTable, readRowFromTable } from "@/lib/supabaseClient";
 
 
 export const useInventoryStore = defineStore("inventory", () => {
