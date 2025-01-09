@@ -1,0 +1,133 @@
+{
+  "Timeline": [
+    {
+      "Component": "Vue Front-End",
+      "Task": "Initialize",
+      "Owner": "Josiah Ehrler Justin Libhart",
+      "Status": "Completed",
+      "Start date": "10/7/2024",
+      "End date": "10/11/2024"
+    },
+    {
+      "Component": "Public Webapp",
+      "Task": "Initialize",
+      "Owner": "Justin Libhart",
+      "Status": "Completed",
+      "Start date": "10/7/2024",
+      "End date": "10/11/2024"
+    },
+    {
+      "Component": "RFID Scanner",
+      "Task": "Initialize",
+      "Owner": "Justin Libhart",
+      "Status": "Not started",
+      "Start date": "10/7/2024",
+      "End date": "10/18/2024"
+    },
+    {
+      "Component": "Supabase Database",
+      "Task": "Initialize",
+      "Owner": "Josiah Ehrler",
+      "Status": "Completed",
+      "Start date": "10/7/2024",
+      "End date": "10/11/2024"
+    },
+    {
+      "Component": "Supabase Database",
+      "Task": "Setup data structure",
+      "Owner": "Josiah Ehrler",
+      "Status": "Not started",
+      "Start date": "10/17/2024",
+      "End date": "10/25/2024"
+    },
+    {
+      "Component": "Vue Front-End",
+      "Task": "Integration with database",
+      "Owner": "Josiah Ehrler",
+      "Status": "Not started",
+      "Start date": "10/17/2024",
+      "End date": "10/25/2024"
+    },
+    {
+      "Component": "Vue Front-End",
+      "Task": "Authentication",
+      "Owner": "Josiah Ehrler Justin Libhart",
+      "Status": "Not started",
+      "Start date": "10/21/2024",
+      "End date": "10/25/2024"
+    },
+    {
+      "Component": "Vue Front-End",
+      "Task": "Table data integration",
+      "Owner": "Josiah Ehrler",
+      "Status": "Not started",
+      "Start date": "10/25/2024",
+      "End date": "10/30/2024"
+    },
+    {
+      "Component": "Public Webapp",
+      "Task": "Make Public",
+      "Owner": "Justin Libhart",
+      "Status": "Completed",
+      "Start date": "10/7/2024",
+      "End date": "10/11/2024"
+    },
+    {
+      "Component": "Public Webapp",
+      "Task": "Project Proposal",
+      "Owner": "Justin Libhart",
+      "Status": "In progress",
+      "Start date": "10/7/2024",
+      "End date": "10/15/2024"
+    },
+    {
+      "Component": "Public Webapp",
+      "Task": "Publish Timeline",
+      "Owner": "Justin Libhart",
+      "Status": "In progress",
+      "Start date": "10/7/2024",
+      "End date": "10/15/2024"
+    },
+    {
+      "Component": "Public Webapp",
+      "Task": "Demo",
+      "Owner": "Justin Libhart",
+      "Status": "In progress",
+      "Start date": "10/7/2024",
+      "End date": "10/15/2024"
+    },
+    {
+      "Component": "RFID Scanner",
+      "Task": "Node Integration with database",
+      "Owner": "Justin Libhart",
+      "Status": "Not started",
+      "Start date": "10/17/2024",
+      "End date": "10/25/2024"
+    },
+    {
+      "Component": "RFID Scanner",
+      "Task": "Detect RFID Scans",
+      "Owner": "Justin Libhart",
+      "Status": "Not started",
+      "Start date": "10/21/2024",
+      "End date": "11/1/2024"
+    },
+    {
+      "Component": "RFID Scanner",
+      "Task": "Get Data from RFID Scans",
+      "Owner": "Justin Libhart",
+      "Status": "Not started",
+      "Start date": "11/4/2024",
+      "End date": "11/8/2024"
+    },
+    {
+      "Component": "RFID Scanner",
+      "Task": "Data Integration with database",
+      "Owner": "Justin Libhart",
+      "Status": "Not started",
+      "Start date": "11/11/2024",
+      "End date": "11/15/2024"
+    }
+  ],
+  "Timeline 1": []
+}

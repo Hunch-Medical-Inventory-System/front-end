@@ -24,26 +24,6 @@
         </v-row>
       </v-container>
     </v-row>
-    <v-row class="text-center justify-center">
-      <v-col>
-        <v-btn class="button-styles" size="x-large" to="/account/login" exact>Demo Login</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn class="button-styles" size="x-large" to="/account">Demo Profile</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn class="button-styles" size="x-large" to="/expired">Expiry Table</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn class="button-styles" size="x-large" to="/account/items/new">Update</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn class="button-styles" size="x-large" to="/log">NFC logs</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn class="button-styles" size="x-large" to="/alerts">Alerts</v-btn>
-      </v-col>
-    </v-row>
     <!-- </v-col> -->
   </v-row>
 </v-app>
@@ -74,7 +54,7 @@
 .title {
   font-family: "Audiowide", sans-serif;
   font-weight: 400;
-  font-size: 80px;
+  font-size: 5em;
   font-style: normal;
   color: hsl(210, 10%, 95%);
 }
@@ -89,7 +69,7 @@
 .title2 {
   font-family: "Share Tech Mono", monospace;
   font-weight: 400;
-  font-size: 60px;
+  font-size: 3em;
   font-style: normal;
   color: hsl(210, 15%, 90%);
 }

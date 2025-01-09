@@ -1,0 +1,27 @@
+[
+  {
+    "Item": "Computer",
+    "Description": "Run web server, backend server, and database (Raspberry Pi)",
+    "Cost": "$40"
+  },
+  {
+    "Item": "Passive RFID scanner",
+    "Description": "Take inventory of supplies",
+    "Cost": "$2000 - $8000"
+  },
+  {
+    "Item": "NFC scanner",
+    "Description": "Report each person and activate inventory of supplies",
+    "Cost": "$40"
+  },
+  {
+    "Item": "RFID sticker",
+    "Description": "Track each supply",
+    "Cost": "$0.10"
+  },
+  {
+    "Item": "NFC tag",
+    "Description": "Track each person",
+    "Cost": "$0.10"
+  }
+]
