@@ -82,13 +82,15 @@ export const readExpirableDataFromTable = async (
   let deletedData = [{}]
   let expiredData = [{}]
 
+  const nowUtc = new Date().toISOString();
+
   try {
     let currentResponse = await supabase
       .from(table)
       .select("*", { count: "exact" })
       .order("id", { ascending: true })
       .eq("is_deleted", false)
-      .lt("expiration_date", new Date().toISOString())
+      .lt("expiry_date", new Date().toISOString())
       .range(
         options.itemsPerPage * (options.page - 1),
         options.itemsPerPage * options.page - 1
@@ -109,7 +111,7 @@ export const readExpirableDataFromTable = async (
       .select("*")
       .order("id", { ascending: true })
       .eq("is_deleted", false)
-      .gt("expiration_date", new Date().toISOString())
+      .gt("expiry_date", new Date().toISOString())
 
     currentData = currentResponse
     deletedData = deletedResponse
