@@ -90,7 +90,6 @@ export const readExpirableDataFromTable = async (
       .select("*", { count: "exact" })
       .order("id", { ascending: true })
       .eq("is_deleted", false)
-      .lt("expiry_date", new Date().toISOString())
       .range(
         options.itemsPerPage * (options.page - 1),
         options.itemsPerPage * options.page - 1
@@ -111,7 +110,7 @@ export const readExpirableDataFromTable = async (
       .select("*")
       .order("id", { ascending: true })
       .eq("is_deleted", false)
-      .gt("expiry_date", new Date().toISOString())
+      .lt("expiry_date", new Date().toISOString())
 
     currentData = currentResponse
     deletedData = deletedResponse

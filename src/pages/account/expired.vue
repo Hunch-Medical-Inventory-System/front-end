@@ -8,19 +8,7 @@ const suppliesStore = useSuppliesStore()
 const inventoryStore = useInventoryStore()
 
 const { suppliesLoading, currentSupplies } = storeToRefs(suppliesStore)
-const { inventoryLoading, currentInventory, currentInventoryLength } = storeToRefs(inventoryStore)
-
-const search = ref('')
-const itemsPerPage = ref(10)
-const page = ref(1)
-const alertMessage = ref(null)
-const headers = ref([
-  { title: 'Id', key: 'id' },
-  { title: 'Supply Name', key: 'supply_id' },
-  { title: 'Expiry Date', key: 'expiry_date' },
-  { title: 'Created At', key: 'created_at' },
-  { title: 'Card Id', key: 'card_id' },
-])
+const { inventoryLoading, currentInventory, expiredInventory, currentInventoryLength } = storeToRefs(inventoryStore)
 
 /**
  * Fetches the inventory from the store, passing the deleted search query,
@@ -67,13 +55,29 @@ const isExpired = (expiryDate) => {
 <template>
   <v-container>
     <v-row class="my-10">
-      <v-expansion-panels variant="accordion">
+      <v-expansion-panels v-if="!inventoryLoading" variant="accordion">
         <v-expansion-panel
-          v-for="i in 3"
-          :key="i"
-          text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-          title="Item"
-        ></v-expansion-panel>
+          v-for="item in expiredInventory.data"
+          :key="item.id"
+        >
+          <v-expansion-panel-title>
+            <v-row>
+              <v-col>{{ item.id }}</v-col>
+              <v-col>
+                {{ suppliesLoading ? 'Loading...' : currentSupplies.data.find(supply => supply.id === item.supply_id)?.item }}
+              </v-col>
+              <v-col>
+                <v-chip color="error">{{ new Date(item.expiry_date).toLocaleDateString() }}</v-chip>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <v-row class="my-5">
+              <v-btn class="ma-auto" color="error">Delete</v-btn>
+            </v-row>
+          </v-expansion-panel-text>
+
+        </v-expansion-panel>
       </v-expansion-panels>
     </v-row>
   </v-container>
