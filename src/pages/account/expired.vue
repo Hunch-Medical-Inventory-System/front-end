@@ -35,6 +35,11 @@
 
 <template>
   <v-container class="my-10">
+
+      <v-row class="text-h4 justify-center text-center mb-5">
+        Expired Inventory
+      </v-row>
+
       <v-carousel
         v-if="!inventoryLoading"
         progress="primary"
@@ -62,7 +67,7 @@
                   <v-chip>Created on: {{ new Date(item.created_at).toLocaleDateString() }}</v-chip>
                 </v-col>
                 <v-col class="text-center">
-                  <v-chip :color="item.expiry_date">Expired on: {{ new Date(item.expiry_date).toLocaleDateString() }}</v-chip>
+                  <v-chip color="error">Expired on: {{ new Date(item.expiry_date).toLocaleDateString() }}</v-chip>
                 </v-col>
               </v-row>
               <v-row class="justify-center">
