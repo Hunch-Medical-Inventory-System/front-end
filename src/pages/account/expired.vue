@@ -1,85 +1,101 @@
 <script setup>
-import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
+  import { ref } from 'vue'
+  import { storeToRefs } from 'pinia'
 
-import { useInventoryStore, useSuppliesStore } from '@/stores/tables'
+  import { useInventoryStore, useSuppliesStore } from '@/stores/tables'
 
-const suppliesStore = useSuppliesStore()
-const inventoryStore = useInventoryStore()
+  const suppliesStore = useSuppliesStore()
+  const inventoryStore = useInventoryStore()
 
-const { suppliesLoading, currentSupplies } = storeToRefs(suppliesStore)
-const { inventoryLoading, currentInventory, expiredInventory, currentInventoryLength } = storeToRefs(inventoryStore)
+  const { suppliesLoading, currentSupplies } = storeToRefs(suppliesStore)
+  const { inventoryLoading, currentInventory, expiredInventory, currentInventoryLength } = storeToRefs(inventoryStore)
 
-/**
- * Fetches the inventory from the store, passing the deleted search query,
- * page number, and items per page as options.
- *
- * @returns {Promise<void>}
- */
-const loadInventory = async () => {
-  inventoryStore.retrieveInventory({
-    keywords: search.value,
-    page: page.value,
-    itemsPerPage: itemsPerPage.value
-  })
-}
+  const isOpenedDelete = ref(false)
+  const itemId = ref(0)
 
-/**
- * Determines the status of an item based on its expiry date.
- *
- * @param {string|Date} expiryDate - The expiry date of the item.
- *
- * @returns {string} - Returns "error" if the item is expired, "warning" if the item
- *                     will expire in 3 days or less, and "success" if the item
- *                     is not expiring soon.
- */
-const isExpired = (expiryDate) => {
-  const today = new Date()
-  const expiry = new Date(expiryDate)
-
-  const msInADay = 24 * 60 * 60 * 1000
-  const differenceInMs = expiry.getTime() - today.getTime()
-  const differenceInDays = differenceInMs / msInADay
-
-  if (expiry.getTime() < today.getTime()) {
-    return "error"
+  /**
+   * Toggles the state of the delete dialog and sets the item ID.
+   *
+   * @param {number} id - The ID of the item to be deleted.
+   */
+  const toggleDelete = (id) => {
+    itemId.value = id
+    isOpenedDelete.value = !isOpenedDelete.value
   }
-  if (Math.floor(differenceInDays) <= 3) {
-    return "warning"
-  }
-  return "success"
 
-}
+  /**
+   * Closes the delete dialog and refreshes the inventory table.
+   */
+  const closeDelete = () => {
+    isOpenedDelete.value = false
+    inventoryStore.retrieveInventory()
+  }
+
 </script>
 
 <template>
-  <v-container>
-    <v-row class="my-10">
-      <v-expansion-panels v-if="!inventoryLoading" variant="accordion">
-        <v-expansion-panel
+  <v-container class="my-10">
+      <v-carousel
+        v-if="!inventoryLoading"
+        progress="primary"
+        height="370"
+        hide-delimiters
+      >
+        <v-carousel-item
           v-for="item in expiredInventory.data"
           :key="item.id"
         >
-          <v-expansion-panel-title>
-            <v-row>
-              <v-col>{{ item.id }}</v-col>
-              <v-col>
+          <v-sheet
+            height="100%"
+            tile
+          >
+            <v-container class="">
+              <v-row>
+                <v-col class="text-start">{{ item.id }}</v-col>
+                <v-col class="text-end">{{ item.card_id }}</v-col>
+              </v-row>
+              <v-row class="text-h4 justify-center text-center">
                 {{ suppliesLoading ? 'Loading...' : currentSupplies.data.find(supply => supply.id === item.supply_id)?.item }}
-              </v-col>
-              <v-col>
-                <v-chip color="error">{{ new Date(item.expiry_date).toLocaleDateString() }}</v-chip>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-title>
-          <v-expansion-panel-text>
-            <v-row class="my-5">
-              <v-btn class="ma-auto" color="error">Delete</v-btn>
-            </v-row>
-          </v-expansion-panel-text>
+              </v-row>
+              <v-row class="my-10">
+                <v-col class="text-center">
+                  <v-chip>Created on: {{ new Date(item.created_at).toLocaleDateString() }}</v-chip>
+                </v-col>
+                <v-col class="text-center">
+                  <v-chip :color="item.expiry_date">Expired on: {{ new Date(item.expiry_date).toLocaleDateString() }}</v-chip>
+                </v-col>
+              </v-row>
+              <v-row class="justify-center">
+                <v-btn  @click="toggleDelete(item.id)" color="error">Delete</v-btn>
+              </v-row>
+            </v-container>
 
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-row>
+          </v-sheet>
+        </v-carousel-item>
+      </v-carousel>
+
+      <v-dialog
+        v-model="isOpenedDelete"
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <v-card class="rounded-lg">
+          <v-toolbar class="rounded-lg">
+            <v-toolbar-title>Delete Item</v-toolbar-title>
+            <v-spacer />
+            <v-btn
+              icon
+              @click="toggleDelete(itemId)"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <DeleteRowConfirmation
+            :id="itemId"
+            :table="'supplies'"
+            @close="closeDelete"
+          />
+        </v-card>
+      </v-dialog>
   </v-container>
-
 </template>
