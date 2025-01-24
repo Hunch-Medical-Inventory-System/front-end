@@ -1,12 +1,13 @@
 import { defineStore } from "pinia";
 import { ref, computed, onMounted } from "vue";
-import { readDataFromTable, readRowFromTable } from "@/lib/supabaseClient";
+import { readDataFromTable, readDeletableDataFromTable, readExpirableDataFromTable, readRowFromTable } from "@/lib/supabaseClient";
 
 
 export const useInventoryStore = defineStore("inventory", () => {
 
-  const currentInventory = ref({data:[{}], count:0});
+  const currentInventory = ref({ data: [{}], count: 0 });
   const deletedInventory = ref({ data: [{}], count: 0 });
+  const expiredInventory = ref({ data: [{}], count: 0 });
 
   const currentInventoryLength = computed(() => currentInventory.value.count);
   const deletedInventoryLength = computed(() => deletedInventory.value.count);
@@ -20,9 +21,11 @@ export const useInventoryStore = defineStore("inventory", () => {
    */
   const retrieveInventory = async (options) => {
     inventoryLoading.value = true;
-    const data = await readDataFromTable("inventory", options);
+    const data = await readExpirableDataFromTable("inventory", options);
     currentInventory.value = data.currentData;
     deletedInventory.value = data.deletedData;
+    expiredInventory.value = data.expiredData;
+
     inventoryLoading.value = false;
   };
 
@@ -34,6 +37,7 @@ export const useInventoryStore = defineStore("inventory", () => {
     inventoryLoading,
     currentInventory,
     deletedInventory,
+    expiredInventory,
     currentInventoryLength,
     deletedInventoryLength,
     retrieveInventory
@@ -58,7 +62,7 @@ export const useSuppliesStore = defineStore("supplies", () => {
    */
   const retrieveSupplies = async (options = {itemsPerPage: 10, page: 1, keywords: "",}) => {
     suppliesLoading.value = true;
-    const data = await readDataFromTable("supplies", options);
+    const data = await readDeletableDataFromTable("supplies", options);
     currentSupplies.value = data.currentData;
     deletedSupplies.value = data.deletedData;
     suppliesLoading.value = false;
@@ -81,23 +85,21 @@ export const useSuppliesStore = defineStore("supplies", () => {
 
 export const useCrewStore = defineStore("crew", () => {
   const currentCrew = ref({ data: [{}], count: 0 });
-  const deletedCrew = ref({ data: [{}], count: 0 });
 
   const currentCrewLength = computed(() => currentCrew.value.count);
-  const deletedCrewLength = computed(() => deletedCrew.value.count);
 
   const crewLoading = ref(true);
 
   /**
-   * Fetches and updates the current and deleted crew from the database.
+   * Retrieves and updates the current crew data from the database.
    *
+   * @param {{itemsPerPage: number, page: number, keywords: string}} options - The options to pass to the readDataFromTable function.
    * @returns {Promise<void>} - A promise that resolves once the crew data is retrieved and updated.
    */
   const retrieveCrew = async (options = {itemsPerPage: 10, page: 1, keywords: "",}) => {
     crewLoading.value = true;
     const data = await readDataFromTable("crew", options);
-    currentCrew.value = data.currentData;
-    deletedCrew.value = data.deletedData;
+    currentCrew.value = data;
     crewLoading.value = false;
   };
 
@@ -108,9 +110,7 @@ export const useCrewStore = defineStore("crew", () => {
   return {
     crewLoading,
     currentCrew,
-    deletedCrew,
     currentCrewLength,
-    deletedCrewLength,
     retrieveCrew
   };
 })
@@ -118,16 +118,15 @@ export const useCrewStore = defineStore("crew", () => {
 
 export const useLogsStore = defineStore("logs", () => {
   const currentLogs = ref({ data: [{}], count: 0 });
-  const deletedLogs = ref({ data: [{}], count: 0 });
 
   const currentLogsLength = computed(() => currentLogs.value.count);
-  const deletedLogsLength = computed(() => deletedLogs.value.count);
 
   const logsLoading = ref(true);
 
   /**
-   * Fetches and updates the current and deleted logs from the database.
+   * Retrieves and updates the current logs from the database.
    *
+   * @param {{itemsPerPage: number, page: number, keywords: string}} options - The options to pass to the readDataFromTable function.
    * @returns {Promise<void>} - A promise that resolves once the logs data is retrieved and updated.
    */
   const retrieveLogs = async (
@@ -135,8 +134,7 @@ export const useLogsStore = defineStore("logs", () => {
   ) => {
     logsLoading.value = true;
     const data = await readDataFromTable("logs", options);
-    currentLogs.value = data.currentData;
-    deletedLogs.value = data.deletedData;
+    currentLogs.value = data;
     logsLoading.value = false;
   };
 
@@ -147,9 +145,7 @@ export const useLogsStore = defineStore("logs", () => {
   return {
     logsLoading,
     currentLogs,
-    deletedLogs,
     currentLogsLength,
-    deletedLogsLength,
     retrieveLogs,
   };
 });
