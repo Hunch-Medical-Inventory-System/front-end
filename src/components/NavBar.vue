@@ -25,6 +25,7 @@
       <v-btn to="/account/expired" exact>Expiry Table</v-btn>
       <v-btn to="/items" exact>Supplies Table</v-btn>
       <v-btn to="/items/logs" exact>Logs Table</v-btn>
+      <v-btn to="/scanner" exact>Logs Table</v-btn>
 
     </template>
   </v-app-bar>
