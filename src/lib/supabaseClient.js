@@ -1,6 +1,5 @@
 // supabaseClient.js
 import { createClient } from "@supabase/supabase-js";
-import { exp } from "three/tsl";
 
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
