@@ -41,7 +41,7 @@
       <v-list-item><v-btn to="/account/available" exact>Available Table</v-btn></v-list-item>
       <v-list-item><v-btn to="/items" exact>Supplies Table</v-btn></v-list-item>
       <v-list-item><v-btn to="/items/logs" exact>Logs Table</v-btn></v-list-item>
-      <v-list-item><v-btn to="/scaneer" exact>Scanner</v-btn></v-list-item>
+      <v-list-item><v-btn to="/scanner" exact>Scanner</v-btn></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
