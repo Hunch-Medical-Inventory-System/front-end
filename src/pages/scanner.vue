@@ -26,7 +26,7 @@ export default {
           console.error("NFC Scan failed:", error);
         }
       } else {
-        alert("NFC scanning is not supported on this device.");
+        alert("SCANNING..");
       }
     }
   }
